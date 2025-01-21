@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبيق إدخال الأسماء</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6c63ff">
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">تطبيق إدخال الأسماء</div>
+    </div>
+    <div class="card-content">
+      <div class="input-container">
+        <input type="text" id="nameInput" class="input" placeholder="أدخل الاسم" />
+        <button class="button" onclick="addName()">إضافة</button>
+      </div>
+      <ul id="namesList" class="name-list"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

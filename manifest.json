@@ -1,0 +1,16 @@
+{
+    "name": "My Product App",
+    "short_name": "ProductApp",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#1a202c",
+    "theme_color": "#6c63ff",
+    "icons": [
+      {
+        "src": "piclumen_1735824683011_YOL_icon.ico",
+        "sizes": "64x64 32x32 24x24 16x16",
+        "type": "image/x-icon"
+      }
+    ]
+  }
+  
