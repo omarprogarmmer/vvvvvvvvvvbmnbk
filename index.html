@@ -1,27 +1,327 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تطبيق إدخال الأسماء</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6c63ff">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تجربة إشعارات المتصفح</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2575fc;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .notification-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-right: 5px solid #6a11cb;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #606c88, #3f4c6b);
+        }
+        
+        .permission-status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .granted {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .denied {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .default {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .notification-example {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            border-right: 4px solid #2575fc;
+        }
+        
+        .notification-example h3 {
+            color: #2575fc;
+            margin-bottom: 10px;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            width: 140px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .feature i {
+            font-size: 2rem;
+            color: #6a11cb;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">تطبيق إدخال الأسماء</div>
+    <div class="container">
+        <h1>تجربة إشعارات المتصفح</h1>
+        
+        <p>هذه الصفحة تتيح لك تجربة إرسال إشعارات من خلال المتصفح كما في التطبيقات الأصلية</p>
+        
+        <div class="notification-box">
+            <h2>حالة صلاحية الإشعارات</h2>
+            <div id="permissionStatus" class="permission-status default">جارِ التحقق...</div>
+            <button id="requestPermission" class="btn">طلب صلاحية الإشعارات</button>
+        </div>
+        
+        <div class="input-group">
+            <label for="notificationTitle">عنوان الإشعار</label>
+            <input type="text" id="notificationTitle" value="مرحباً!">
+        </div>
+        
+        <div class="input-group">
+            <label for="notificationBody">نص الإشعار</label>
+            <textarea id="notificationBody">هذا إشعار تجريبي من الموقع</textarea>
+        </div>
+        
+        <button id="sendNotification" class="btn">إرسال إشعار الآن</button>
+        <button id="scheduleNotification" class="btn btn-secondary">إرسال إشعار بعد 5 ثوان</button>
+        
+        <div class="notification-example">
+            <h3>معلومات عن الإشعارات</h3>
+            <p>الإشعارات تعمل حتى عندما يكون الموقع غير مفتوح، ولكنها تتطلب إذنًا من المستخدم أولاً.</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div>📱</div>
+                <p>يعمل على الجوال</p>
+            </div>
+            <div class="feature">
+                <div>💻</div>
+                <p>يعمل على الكمبيوتر</p>
+            </div>
+            <div class="feature">
+                <div>🔔</div>
+                <p>إشعارات فورية</p>
+            </div>
+        </div>
     </div>
-    <div class="card-content">
-      <div class="input-container">
-        <input type="text" id="nameInput" class="input" placeholder="أدخل الاسم" />
-        <button class="button" onclick="addName()">إضافة</button>
-      </div>
-      <ul id="namesList" class="name-list"></ul>
-    </div>
-  </div>
 
-  <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const permissionStatus = document.getElementById('permissionStatus');
+            const requestPermissionBtn = document.getElementById('requestPermission');
+            const sendNotificationBtn = document.getElementById('sendNotification');
+            const scheduleNotificationBtn = document.getElementById('scheduleNotification');
+            
+            // التحقق من حالة الصلاحية
+            function checkNotificationPermission() {
+                if (!('Notification' in window)) {
+                    permissionStatus.textContent = 'المتصفح لا يدعم الإشعارات';
+                    permissionStatus.className = 'permission-status denied';
+                    requestPermissionBtn.disabled = true;
+                    sendNotificationBtn.disabled = true;
+                    scheduleNotificationBtn.disabled = true;
+                    return;
+                }
+                
+                if (Notification.permission === 'granted') {
+                    permissionStatus.textContent = 'تم منح صلاحية الإشعارات';
+                    permissionStatus.className = 'permission-status granted';
+                    requestPermissionBtn.disabled = true;
+                } else if (Notification.permission === 'denied') {
+                    permissionStatus.textContent = 'تم رفض صلاحية الإشعارات';
+                    permissionStatus.className = 'permission-status denied';
+                    requestPermissionBtn.disabled = true;
+                    sendNotificationBtn.disabled = true;
+                    scheduleNotificationBtn.disabled = true;
+                } else {
+                    permissionStatus.textContent = 'لم يتم طلب صلاحية الإشعارات بعد';
+                    permissionStatus.className = 'permission-status default';
+                }
+            }
+            
+            // طلب الصلاحية
+            requestPermissionBtn.addEventListener('click', function() {
+                Notification.requestPermission().then(function(permission) {
+                    checkNotificationPermission();
+                });
+            });
+            
+            // إرسال إشعار
+            function sendNotification() {
+                const title = document.getElementById('notificationTitle').value || 'عنوان افتراضي';
+                const body = document.getElementById('notificationBody').value || 'محتوى افتراضي';
+                
+                if (Notification.permission === 'granted') {
+                    new Notification(title, { body, icon: 'https://example.com/icon.png' });
+                } else {
+                    alert('يجب منح صلاحية الإشعارات أولاً');
+                }
+            }
+            
+            // إرسال إشعار مجدول
+            function scheduleNotification() {
+                if (Notification.permission !== 'granted') {
+                    alert('يجب منح صلاحية الإشعارات أولاً');
+                    return;
+                }
+                
+                sendNotificationBtn.disabled = true;
+                scheduleNotificationBtn.disabled = true;
+                
+                let secondsLeft = 5;
+                scheduleNotificationBtn.textContent = `جاري الجدولة (${secondsLeft})`;
+                
+                const countdown = setInterval(() => {
+                    secondsLeft--;
+                    scheduleNotificationBtn.textContent = `جاري الجدولة (${secondsLeft})`;
+                    
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdown);
+                        sendNotification();
+                        scheduleNotificationBtn.textContent = 'إرسال إشعار بعد 5 ثوان';
+                        sendNotificationBtn.disabled = false;
+                        scheduleNotificationBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+            
+            sendNotificationBtn.addEventListener('click', sendNotification);
+            scheduleNotificationBtn.addEventListener('click', scheduleNotification);
+            
+            // التحقق الأولي من الصلاحية
+            checkNotificationPermission();
+        });
+    </script>
 </body>
 </html>
