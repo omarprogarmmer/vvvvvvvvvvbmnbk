@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0d1117" />
-  <title>الصفحة الرئيسية</title>
+  <title>حول التطبيق</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,16 +54,15 @@
 <body>
 
   <div class="card">
-    <h1>🏠 الصفحة الرئيسية</h1>
-    <p>هذه الصفحة الأولى</p>
+    <h1>ℹ️ حول التطبيق</h1>
+    <p>هذه الصفحة الثانية، وهي أيضاً تعمل دون اتصال.</p>
 
-    <a href="about.html" class="btn">الانتقال إلى صفحة "حول" ←</a>
+    <a href="index.html" class="btn">→ العودة إلى الصفحة الرئيسية</a>
 
     <div id="status" class="status online">الحالة: متصل</div>
   </div>
 
   <script>
-    // حالة الاتصال
     const statusEl = document.getElementById('status');
     function updateStatus() {
       statusEl.textContent = navigator.onLine ? 'الحالة: متصل ✅' : 'الحالة: دون اتصال ⚡';
@@ -72,15 +71,6 @@
     window.addEventListener('online', updateStatus);
     window.addEventListener('offline', updateStatus);
     updateStatus();
-
-    // تسجيل Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log('تم تسجيل SW'))
-          .catch(err => console.log('فشل:', err));
-      });
-    }
   </script>
 </body>
 </html>
