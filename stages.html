@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة المراحل</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+  :root {
+    --bg-page: #f0e8d8;
+
+    --frame-color: #2e7d32;
+    --frame-height: 50px;
+    --frame-text: #ffffff;
+    --exit-text: #cccccc;
+
+    --stage-bg: #0d47a1;
+    --stage-completed-text: #90caf9;
+    --stage-current-text: #e0e0e0;
+    --stage-locked-opacity: 0.35;
+
+    --line-color: #000000;
+    --line-thickness: 3px;
+    --divider-thickness: 6px;
+
+    --radius: 64px;
+    --gap-y: 100px;
+  }
+
+  html, body { height: 100%; }
+  body {
+    min-height: 100vh;
+    background: var(--bg-page);
+    padding-bottom: 120px;
+    overflow-x: hidden;
+  }
+
+  .top-frame {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--frame-height);
+    background: var(--frame-color);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; z-index: 999;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  }
+  .page-title {
+    font-size: 16px; font-weight: 700; color: var(--frame-text);
+  }
+  .exit-btn {
+    width: 38px; height: 38px;
+    background: transparent;
+    color: var(--exit-text);
+    border: 2px solid var(--exit-text);
+    border-radius: 50%;
+    font-size: 22px; font-weight: 900;
+    line-height: 1;
+    cursor: pointer; transition: 0.25s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Arial, sans-serif;
+  }
+  .exit-btn:hover {
+    color: #fff; border-color: #fff;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .bottom-frame {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--frame-height); background: var(--frame-color);
+    z-index: 999;
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.2);
+  }
+
+  .map-container {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: calc(var(--frame-height) + 60px) 20px 60px;
+  }
+
+  .path-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .path-svg path {
+    fill: none;
+    stroke: var(--line-color);
+    stroke-width: var(--line-thickness);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .stages-wrapper {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--gap-y);
+    align-items: center;
+  }
+
+  .stage-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stage-circle {
+    width: var(--radius);
+    height: var(--radius);
+    border-radius: 50%;
+    background: var(--stage-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s, opacity 0.25s;
+    user-select: none;
+    position: relative;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    border: 4px solid rgba(255,255,255,0.15);
+  }
+
+  .stage-circle:hover {
+    transform: scale(1.08);
+  }
+
+  .stage-circle.completed {
+    color: var(--stage-completed-text);
+  }
+
+  .stage-circle.current {
+    color: var(--stage-current-text);
+    box-shadow: 0 0 0 6px rgba(13,71,161,0.15),
+                0 6px 14px rgba(0,0,0,0.3);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .stage-circle.current .stage-num { display: none; }
+  .stage-circle.current::after {
+    content: "＋";
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--stage-current-text);
+    line-height: 1;
+  }
+
+  .stage-circle.locked {
+    opacity: var(--stage-locked-opacity);
+    cursor: not-allowed;
+  }
+  .stage-circle.locked:hover {
+    transform: none;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 6px rgba(13,71,161,0.15), 0 6px 14px rgba(0,0,0,0.3); }
+    50%      { box-shadow: 0 0 0 14px rgba(13,71,161,0.05), 0 6px 14px rgba(0,0,0,0.3); }
+  }
+
+  .stage-num {
+    color: inherit;
+    pointer-events: none;
+  }
+
+  .stage-popup {
+    position: absolute;
+    right: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.6);
+    background: var(--stage-bg);
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    z-index: 10;
+  }
+  .stage-popup.show {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+  .stage-popup::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 7px solid transparent;
+    border-left-color: var(--stage-bg);
+  }
+
+  .thick-divider {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    height: var(--divider-thickness);
+    background: var(--line-color);
+    margin: 20px 0;
+    z-index: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --radius: 56px;
+      --gap-y: 85px;
+    }
+    .stage-circle { font-size: 20px; }
+    .stage-circle.current::after { font-size: 34px; }
+    .stage-popup { font-size: 12px; padding: 5px 12px; }
+  }
+
+  @media (max-width: 360px) {
+    :root {
+      --radius: 50px;
+      --gap-y: 78px;
+    }
+    .stage-circle { font-size: 18px; border-width: 3px; }
+    .stage-circle.current::after { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-frame">
+  <div class="page-title">🗺️ خريطة المراحل</div>
+  <button class="exit-btn" id="exitBtn">&gt;</button>
+</div>
+
+<div class="map-container" id="mapContainer">
+
+  <svg class="path-svg" id="pathSvg" preserveAspectRatio="none">
+    <path id="pathLine" d="" />
+  </svg>
+
+  <div class="stages-wrapper" id="stagesWrapper"></div>
+
+</div>
+
+<div class="bottom-frame"></div>
+
+<script>
+/* ============================================================
+   ⚙️ الإعدادات
+   ============================================================ */
+
+const CONFIG = {
+  /* 🗺️ عدد المراحل */
+  totalStages: 20,
+
+  /* ➖ كل 5 مراحل → خط أفقي عريض */
+  dividerEvery: 5,
+
+  /* 🚪 الخروج */
+  exitUrl: "profile.html",
+  exitConfirmMessage: "هل تريد الخروج؟",
+
+  /* 🔑 مفاتيح التخزين */
+  lessonsKey:   "lessons_stages_count",
+  exercisesKey: "exercises_stages_count",
+
+  /* 🔗 ربط كل مرحلة بصفحتها
+     ✏️ عدّل هذا الجدول حسب ملفاتك الفعلية */
+  stageLinks: {
+    1:  "lesson1.html",
+    2:  "drag1.html",
+    3:  "drag2.html",
+    4:  "drag3.html",
+    5:  "drag4.html",
+    6:  "drag5.html",
+    7:  "drag6.html",
+    8:  "drag7.html",
+    9:  "drag8.html",
+    10: "drag9.html",
+    11: "drag10.html",
+    12: "drag11.html",
+    13: "drag12.html",
+    14: "drag13.html",
+    15: "drag14.html",
+    16: "drag15.html",
+    17: "drag16.html",
+    18: "drag17.html",
+    19: "drag18.html",
+    20: "drag19.html",
+  },
+};
+
+/* ============================================================
+   🔙 زر الخروج
+   ============================================================ */
+
+document.getElementById("exitBtn").onclick = () => {
+  if (confirm(CONFIG.exitConfirmMessage)) {
+    window.location.href = CONFIG.exitUrl;
+  }
+};
+
+/* ============================================================
+   📊 عدد المراحل المكتملة
+   ============================================================ */
+
+function getCompletedCount() {
+  const lessons   = parseInt(localStorage.getItem(CONFIG.lessonsKey)   || "0", 10);
+  const exercises = parseInt(localStorage.getItem(CONFIG.exercisesKey) || "0", 10);
+  return lessons + exercises;
+}
+
+/* ============================================================
+   🎯 حالة المرحلة
+   ============================================================ */
+
+function getStageState(index) {
+  const completed = getCompletedCount();
+
+  if (index <= completed)         return "completed";
+  if (index === completed + 1)    return "current";
+  return "locked";
+}
+
+/* ============================================================
+   🏗️ بناء المراحل
+   ============================================================ */
+
+const stagesWrapper = document.getElementById("stagesWrapper");
+
+function buildStages() {
+  stagesWrapper.innerHTML = "";
+
+  for (let i = 1; i <= CONFIG.totalStages; i++) {
+    const state = getStageState(i);
+
+    const circle = document.createElement("div");
+    circle.className = "stage-circle " + state;
+    circle.dataset.index = i;
+
+    const num = document.createElement("span");
+    num.className = "stage-num";
+    num.textContent = i;
+    circle.appendChild(num);
+
+    const popup = document.createElement("div");
+    popup.className = "stage-popup";
+    popup.textContent = "المرحلة " + i;
+
+    const row = document.createElement("div");
+    row.className = "stage-row";
+    row.appendChild(circle);
+    row.appendChild(popup);
+    stagesWrapper.appendChild(row);
+
+    circle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      handleStageClick(i, state, popup);
+    });
+
+    if (i % CONFIG.dividerEvery === 0 && i < CONFIG.totalStages) {
+      const divider = document.createElement("div");
+      divider.className = "thick-divider";
+      stagesWrapper.appendChild(divider);
+    }
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(drawPath);
+  });
+}
+
+/* ============================================================
+   🖱️ عند الضغط على مرحلة
+   ============================================================ */
+
+function handleStageClick(index, state, popup) {
+  popup.classList.add("show");
+  clearTimeout(popup._t);
+  popup._t = setTimeout(() => popup.classList.remove("show"), 2000);
+
+  if (state === "locked") {
+    setTimeout(() => alert("🔒 هذه المرحلة مقفلة"), 200);
+    return;
+  }
+
+  const link = CONFIG.stageLinks[index];
+  if (link) {
+    setTimeout(() => window.location.href = link, 500);
+  } else {
+    setTimeout(() => alert("⚠️ لا توجد صفحة للمرحلة " + index), 200);
+  }
+}
+
+/* ============================================================
+   🛤️ رسم المسار المتعرج بين المراحل
+   ============================================================ */
+
+function drawPath() {
+  const svg     = document.getElementById("pathSvg");
+  const path    = document.getElementById("pathLine");
+  const container = document.getElementById("mapContainer");
+  const circles = Array.from(document.querySelectorAll(".stage-circle"));
+
+  if (circles.length === 0) return;
+
+  const containerRect = container.getBoundingClientRect();
+
+  const points = circles.map(circle => {
+    const rect = circle.getBoundingClientRect();
+    return {
+      x: rect.left - containerRect.left + rect.width / 2,
+      y: rect.top  - containerRect.top  + rect.height / 2,
+    };
+  });
+
+  points.sort((a, b) => b.y - a.y);
+
+  const w = container.offsetWidth;
+  const h = container.offsetHeight;
+  svg.setAttribute("width", w);
+  svg.setAttribute("height", h);
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+  let d = "";
+  points.forEach((p, i) => {
+    if (i === 0) {
+      d += `M ${p.x} ${p.y}`;
+    } else {
+      const prev = points[i - 1];
+      const midY = (prev.y + p.y) / 2;
+      d += ` C ${prev.x} ${midY}, ${p.x} ${midY}, ${p.x} ${p.y}`;
+    }
+  });
+
+  path.setAttribute("d", d);
+}
+
+/* ============================================================
+   📜 التمرير التلقائي للأسفل
+   ============================================================ */
+
+function scrollToBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+/* ============================================================
+   🚀 التشغيل
+   ============================================================ */
+
+buildStages();
+setTimeout(scrollToBottom, 300);
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(drawPath, 250);
+});
+
+window.addEventListener("stageCompleted", (e) => {
+  console.log("🎯 اكتملت مرحلة:", e.detail);
+  buildStages();
+});
+</script>
+
+</body>
+</html>

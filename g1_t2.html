@@ -1,0 +1,647 @@
+<!-- id : 288 اسم الصفحة للتغير  -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تمرين السحب والإفلات</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+  :root {
+    --bg-page: #f0e8d8;
+    --text-color: #3d3d3d;
+    --frame-color: #2e7d32;
+    --frame-height: 50px;
+    --frame-text: #ffffff;
+    --exit-bg: #c62828;
+    --exit-text: #ffffff;
+    --drop-bg: #5cb85c;
+    --item-bg: #1b5e20;
+    --item-text: #ffffff;
+    --label-color: #ffffff;
+    --divider-color: #000000;
+    --divider-height: 2px;
+    --reset-bg: #c62828;
+    --reset-text: #ffffff;
+  }
+
+  html, body { height: 100%; }
+  body {
+    min-height: 100vh;
+    background: var(--bg-page);
+    color: var(--text-color);
+    padding-bottom: 120px;
+  }
+
+  .top-frame {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--frame-height);
+    background: var(--frame-color);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px; z-index: 999;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .lesson-name { font-size: 16px; font-weight: 700; color: var(--frame-text); }
+  .exit-btn {
+    padding: 7px 14px; background: var(--exit-bg); color: var(--exit-text);
+    border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: 0.25s;
+  }
+  .exit-btn:hover { opacity: 0.85; }
+
+  .bottom-frame {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--frame-height); background: var(--frame-color);
+    z-index: 999; box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
+  }
+
+  .fixed-actions {
+    position: fixed; bottom: var(--frame-height); left: 0; right: 0;
+    background: var(--bg-page); padding: 12px 22px;
+    display: flex; justify-content: center; gap: 14px;
+    z-index: 998; border-top: 1px solid #d0c8b8;
+  }
+
+  .nav-btn {
+    flex: 1; max-width: 320px; padding: 12px 20px;
+    border: 1.5px solid #c9c2b5; border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: 0.25s; background: #fff; color: #4a4a4a;
+  }
+
+  .nav-btn.reset {
+    background: var(--reset-bg); color: var(--reset-text);
+    border-color: var(--reset-bg);
+  }
+  .nav-btn.reset:hover { opacity: 0.9; }
+
+  .nav-btn.check {
+    background: var(--item-bg); color: #fff; border-color: var(--item-bg);
+  }
+  .nav-btn.check:hover { opacity: 0.9; }
+
+  .page-wrapper {
+    padding: calc(var(--frame-height) + 20px) 20px 20px;
+    display: flex; justify-content: center;
+  }
+  .content-wrapper {
+    width: 100%; max-width: 780px;
+    animation: fadeIn 0.45s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    direction: rtl;
+  }
+
+  .question-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--label-color);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    text-align: right;
+    line-height: 1.3;
+  }
+
+  .drop-slot {
+    background: var(--drop-bg);
+    border-radius: 8px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: 0.2s;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .divider {
+    height: var(--divider-height);
+    background: var(--divider-color);
+    margin: 24px 0;
+    width: 100%;
+  }
+
+  .items-pool {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 10px;
+    min-height: 100px;
+    border-radius: 12px;
+  }
+
+  .item-slot {
+    height: 46px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .drag-item {
+    background: var(--item-bg);
+    color: var(--item-text);
+    height: 46px;
+    width: 100%;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: grab;
+    user-select: none;
+    transition: 0.2s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    touch-action: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drag-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.22);
+  }
+
+  .drag-item:active {
+    cursor: grabbing;
+    transform: scale(1.04);
+  }
+
+  .drag-item.dragging { opacity: 0.5; }
+
+  .item-slot.taken .drag-item {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: grayscale(60%);
+  }
+
+  .drop-slot .drag-item {
+    height: 100%;
+    width: 100%;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 0;
+    box-shadow: none;
+    cursor: grab;
+  }
+
+  .drop-slot .drag-item:hover {
+    transform: none;
+    box-shadow: none;
+    opacity: 0.9;
+  }
+
+  .result-msg {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 20px;
+    height: 24px;
+    color: var(--item-bg);
+  }
+  .result-msg.error { color: #c62828; }
+
+  @media (max-width: 480px) {
+    .question-row { grid-template-columns: 130px 1fr; gap: 10px; margin-bottom: 14px; }
+    .question-label { font-size: 14px; }
+    .drop-slot      { height: 44px; font-size: 13px; }
+    .item-slot      { height: 42px; }
+    .drag-item      { height: 42px; padding: 0 14px; font-size: 13px; }
+    .drop-slot .drag-item { font-size: 12px; padding: 0 6px; }
+    .items-pool { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  }
+
+  @media (max-width: 360px) {
+    .question-row   { grid-template-columns: 110px 1fr; gap: 8px; }
+    .question-label { font-size: 13px; }
+    .drop-slot      { height: 40px; font-size: 12px; }
+    .item-slot      { height: 38px; }
+    .drag-item      { height: 38px; font-size: 12px; padding: 0 10px; }
+    .drop-slot .drag-item { font-size: 11px; }
+    .items-pool { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-frame">
+  <div class="lesson-name" id="lessonName">—</div>
+  <button class="exit-btn" id="exitBtn">🚪 خروج</button>
+</div>
+
+<div class="page-wrapper">
+  <div class="content-wrapper">
+    <div id="dropZone"></div>
+    <div class="divider"></div>
+    <div class="items-pool" id="itemsPool"></div>
+    <div class="result-msg" id="resultMsg"></div>
+  </div>
+</div>
+
+<div class="fixed-actions">
+  <button class="nav-btn reset" id="resetBtn">🔄 إعادة</button>
+  <button class="nav-btn check" id="checkBtn">✅ تحقق</button>
+</div>
+
+<div class="bottom-frame"></div>
+
+<script>
+/* ============================================================
+   ⚙️ الإعدادات - غيّر id و items فقط لكل تمرين جديد
+   ============================================================ */
+
+const CONFIG = {
+
+  /* ============================================================
+     🆔 اسم التمرين - بسيط وفريد
+     ============================================================
+     💡 أمثلة: "drag1", "drag2", "drag3"
+               "hadith1", "hadith2"
+               "arkan1", "arkan2"
+     ⚠️ لا تكرر الاسم بين التمارين!
+     ============================================================ */
+  id: "drag2",
+
+  /* ============================================================
+     🚪 الخروج
+     ============================================================ */
+  exitUrl: "profile.html",
+  exitConfirmMessage: "هل تريد الخروج؟",
+
+  /* ============================================================
+     🏆 مفاتيح المراحل - ⚠️ لا تغيّرها أبداً
+     ============================================================ */
+  exercisesStagesKey: "exercises_stages_count",  // عدد المراحل المكتملة
+  solvedListKey:      "solved_exercises_list",   // قائمة التمارين المحلولة
+
+  /* ============================================================
+     🎯 محتوى التمرين - غيّره لكل تمرين
+     ============================================================ */
+  items: [
+    { id: "item_1", text: "الصلاة على النبي", label: "قال النبي ﷺ:" },
+    { id: "item_2", text: "باب يسمى الريان",  label: "في الجنة ثمانية أبواب" },
+    { id: "item_3", text: "الا الصائمون",      label: "لا يدخل" },
+  ],
+
+  /* ============================================================
+     💬 الرسائل
+     ============================================================ */
+  successMessage: "✅ أحسنت! كل الإجابات صحيحة",
+  emptyMessage:   "⚠️ املأ كل المربعات أولاً",
+  retryMessage:   "❌ حاول مرة أخرى",
+
+  resetConfirmMessage: "",
+  successRedirectUrl: "",
+  successRedirectDelay: 2000,
+};
+
+/* ============================================================
+   🚀 التشغيل
+   ============================================================ */
+
+document.getElementById('lessonName').textContent = CONFIG.id;
+
+document.getElementById('exitBtn').onclick = () => {
+  if (confirm(CONFIG.exitConfirmMessage)) {
+    window.location.href = CONFIG.exitUrl;
+  }
+};
+
+const dropZone  = document.getElementById('dropZone');
+const itemsPool = document.getElementById('itemsPool');
+const checkBtn  = document.getElementById('checkBtn');
+const resetBtn  = document.getElementById('resetBtn');
+const resultMsg = document.getElementById('resultMsg');
+
+/* 🏗️ بناء منطقة الإفلات */
+function buildDropZone() {
+  dropZone.innerHTML = '';
+  CONFIG.items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'question-row';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = item.label;
+
+    const slot = document.createElement('div');
+    slot.className = 'drop-slot';
+    slot.dataset.slotId = item.id;
+
+    row.appendChild(label);
+    row.appendChild(slot);
+    dropZone.appendChild(row);
+  });
+}
+
+/* 🏗️ بناء العناصر */
+function buildItems() {
+  itemsPool.innerHTML = '';
+  const shuffled = [...CONFIG.items].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(item => {
+    const slot = document.createElement('div');
+    slot.className = 'item-slot';
+    slot.dataset.slotId = item.id;
+
+    const el = document.createElement('div');
+    el.className = 'drag-item';
+    el.draggable = true;
+    el.dataset.itemId = item.id;
+    el.dataset.target = item.id;
+    el.textContent = item.text;
+
+    slot.appendChild(el);
+    itemsPool.appendChild(slot);
+    attachDragEvents(el);
+  });
+}
+
+/* 🖱️ أحداث السحب */
+let draggedItem = null;
+
+function attachDragEvents(el) {
+  el.addEventListener('dragstart', (e) => {
+    draggedItem = el;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', el.dataset.itemId);
+  });
+
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    draggedItem = null;
+  });
+
+  el.addEventListener('touchstart', handleTouchStart, { passive: false });
+  el.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+  el.addEventListener('touchend',   handleTouchEnd);
+}
+
+/* 🎯 إعداد مناطق الإفلات */
+function setupDropSlots() {
+  document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  });
+
+  document.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (!draggedItem) return;
+
+    const slot = e.target.closest('.drop-slot');
+    const pool = e.target.closest('.items-pool');
+
+    if (slot) {
+      placeItemInSlot(draggedItem, slot);
+    } else if (pool) {
+      returnItemToPool(draggedItem);
+    }
+  });
+}
+
+/* 👆 دعم اللمس */
+let touchClone = null;
+
+function handleTouchStart(e) {
+  const el = e.currentTarget;
+  draggedItem = el;
+
+  const touch = e.touches[0];
+  touchClone = el.cloneNode(true);
+  touchClone.style.position = 'fixed';
+  touchClone.style.zIndex = '9999';
+  touchClone.style.pointerEvents = 'none';
+  touchClone.style.opacity = '0.85';
+  touchClone.style.transform = 'scale(1.05)';
+  touchClone.style.left = (touch.clientX - el.offsetWidth / 2) + 'px';
+  touchClone.style.top  = (touch.clientY - el.offsetHeight / 2) + 'px';
+  touchClone.style.width = el.offsetWidth + 'px';
+  touchClone.style.height = el.offsetHeight + 'px';
+  document.body.appendChild(touchClone);
+
+  el.style.opacity = '0.3';
+  e.preventDefault();
+}
+
+function handleTouchMove(e) {
+  if (!touchClone) return;
+  const touch = e.touches[0];
+  touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px';
+  touchClone.style.top  = (touch.clientY - touchClone.offsetHeight / 2) + 'px';
+  e.preventDefault();
+}
+
+function handleTouchEnd(e) {
+  if (!touchClone || !draggedItem) return;
+
+  const touch = e.changedTouches[0];
+  touchClone.style.display = 'none';
+  const elBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+  touchClone.remove();
+  touchClone = null;
+
+  const slot = elBelow?.closest('.drop-slot');
+  const pool = elBelow?.closest('.items-pool');
+
+  if (slot) {
+    placeItemInSlot(draggedItem, slot);
+  } else if (pool) {
+    returnItemToPool(draggedItem);
+  } else {
+    draggedItem.style.opacity = '';
+  }
+
+  draggedItem = null;
+}
+
+/* 📦 وضع العنصر داخل المربع */
+function placeItemInSlot(item, slot) {
+  const itemId = item.dataset.itemId;
+
+  const existing = slot.querySelector('.drag-item');
+  if (existing) {
+    returnItemToPool(existing);
+  }
+
+  const clone = item.cloneNode(true);
+  clone.classList.remove('dragging');
+  clone.style.opacity = '';
+  clone.draggable = true;
+  clone.dataset.itemId = itemId;
+  clone.dataset.target = item.dataset.target;
+  attachDragEvents(clone);
+
+  slot.textContent = '';
+  slot.appendChild(clone);
+
+  const originalSlot = itemsPool.querySelector(
+    `.item-slot[data-slot-id="${itemId}"]`
+  );
+  if (originalSlot) {
+    originalSlot.classList.add('taken');
+  }
+
+  resultMsg.textContent = '';
+}
+
+/* 📦 إرجاع العنصر للمخزن */
+function returnItemToPool(item) {
+  const itemId = item.dataset.itemId;
+
+  if (item.parentElement.classList.contains('drop-slot')) {
+    const originalSlot = itemsPool.querySelector(
+      `.item-slot[data-slot-id="${itemId}"]`
+    );
+    if (originalSlot) {
+      originalSlot.classList.remove('taken');
+    }
+    item.remove();
+  }
+
+  resultMsg.textContent = '';
+}
+
+/* 🔄 زر الإعادة */
+resetBtn.onclick = () => {
+  if (CONFIG.resetConfirmMessage) {
+    if (!confirm(CONFIG.resetConfirmMessage)) return;
+  }
+
+  document.querySelectorAll('.drop-slot').forEach(slot => {
+    const item = slot.querySelector('.drag-item');
+    if (item) item.remove();
+  });
+
+  document.querySelectorAll('.item-slot').forEach(slot => {
+    slot.classList.remove('taken');
+  });
+
+  resultMsg.textContent = '';
+  resultMsg.className = 'result-msg';
+};
+
+/* ============================================================
+   🏆 تسجيل التمرين كمحلول
+   ============================================================
+   ✅ المنطق:
+   1. اقرأ قائمة التمارين المحلولة من localStorage
+   2. إذا id موجود في القائمة → لا تفعل شيئاً (تم حله من قبل)
+   3. إذا id غير موجود → أضفه + زد العداد 1
+   ============================================================ */
+
+function markAsSolved(exerciseId) {
+  try {
+    // 1️⃣ اقرأ قائمة التمارين المحلولة
+    let solvedList = [];
+    try {
+      solvedList = JSON.parse(localStorage.getItem(CONFIG.solvedListKey) || "[]");
+    } catch (_) {
+      solvedList = [];
+    }
+
+    // 2️⃣ هل تم حله من قبل؟
+    if (solvedList.includes(exerciseId)) {
+      console.log("🔒 تم حل هذا التمرين من قبل:", exerciseId);
+      return {
+        alreadySolved: true,
+        total: parseInt(localStorage.getItem(CONFIG.exercisesStagesKey) || "0", 10)
+      };
+    }
+
+    // 3️⃣ لم يُحل من قبل → سجّله
+    solvedList.push(exerciseId);
+    localStorage.setItem(CONFIG.solvedListKey, JSON.stringify(solvedList));
+
+    // 4️⃣ زد العداد 1
+    const current  = parseInt(localStorage.getItem(CONFIG.exercisesStagesKey) || "0", 10);
+    const newCount = current + 1;
+    localStorage.setItem(CONFIG.exercisesStagesKey, String(newCount));
+
+    console.log("✅ تم تسجيل التمرين:", exerciseId, "| الإجمالي:", newCount);
+    return { alreadySolved: false, total: newCount };
+
+  } catch (e) {
+    console.error("markAsSolved error:", e);
+    return { alreadySolved: false, total: 0 };
+  }
+}
+
+/* ✅ زر التحقق */
+checkBtn.onclick = () => {
+  const slots = document.querySelectorAll('.drop-slot');
+  let allCorrect = true;
+  let allFilled  = true;
+
+  slots.forEach(slot => {
+    const item = slot.querySelector('.drag-item');
+
+    if (!item) {
+      allFilled = false;
+      return;
+    }
+
+    if (item.dataset.target !== slot.dataset.slotId) {
+      allCorrect = false;
+    }
+  });
+
+  if (!allFilled) {
+    resultMsg.textContent = CONFIG.emptyMessage;
+    resultMsg.className = 'result-msg error';
+    return;
+  }
+
+  if (allCorrect) {
+    resultMsg.textContent = CONFIG.successMessage;
+    resultMsg.className = 'result-msg success';
+
+    // 🏆 سجّل التمرين كمحلول
+    if (CONFIG.id) {
+      markAsSolved(CONFIG.id);
+    }
+
+    if (CONFIG.successRedirectUrl) {
+      setTimeout(() => {
+        window.location.href = CONFIG.successRedirectUrl;
+      }, CONFIG.successRedirectDelay);
+    }
+  } else {
+    resultMsg.textContent = CONFIG.retryMessage;
+    resultMsg.className = 'result-msg error';
+  }
+};
+
+/* 🚀 التشغيل */
+buildDropZone();
+buildItems();
+setupDropSlots();
+</script>
+
+</body>
+</html>

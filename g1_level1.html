@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قالب الدرس</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+  :root {
+    --bg-page: #f5f3ee;
+    --text-color: #3d3d3d;
+    --border-color: #e0dbd0;
+    --box-bg: #ffffff;
+    --btn-bg: #ffffff;
+    --btn-text: #4a4a4a;
+    --btn-border: #c9c2b5;
+    --btn-next-bg: #3a4a3f;
+    --btn-next-text: #ffffff;
+    --btn-finish-bg: #2e7d32;
+    --frame-color: #2e7d32;
+    --frame-height: 50px;
+    --frame-text: #ffffff;
+    --exit-text: #cccccc;
+  }
+
+  html, body { height: 100%; }
+  body {
+    min-height: 100vh;
+    background: var(--bg-page);
+    color: var(--text-color);
+    padding-bottom: 120px;
+  }
+
+  .top-frame {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--frame-height);
+    background: var(--frame-color);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 18px; z-index: 999;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .lesson-name { font-size: 16px; font-weight: 700; color: var(--frame-text); }
+
+  .exit-btn {
+    width: 38px; height: 38px; padding: 0;
+    background: transparent;
+    color: var(--exit-text);
+    border: 2px solid var(--exit-text);
+    border-radius: 50%;
+    font-size: 22px; font-weight: 900; line-height: 1;
+    cursor: pointer; transition: 0.25s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: Arial, sans-serif;
+  }
+  .exit-btn:hover {
+    color: #ffffff; border-color: #ffffff;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .bottom-frame {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--frame-height); background: var(--frame-color);
+    z-index: 999; box-shadow: 0 -3px 10px rgba(0,0,0,0.15);
+  }
+
+  .fixed-actions {
+    position: fixed; bottom: var(--frame-height); left: 0; right: 0;
+    background: var(--bg-page); padding: 12px 22px;
+    display: flex; justify-content: center; gap: 14px;
+    z-index: 998; border-top: 1px solid var(--border-color);
+  }
+
+  .nav-btn {
+    flex: 1; max-width: 320px; padding: 12px 20px;
+    border: 1.5px solid var(--btn-border); border-radius: 8px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: 0.25s; background: var(--btn-bg); color: var(--btn-text);
+  }
+  .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav-btn.next { background: var(--btn-next-bg); color: var(--btn-next-text); border-color: var(--btn-next-bg); }
+  .nav-btn.finish { background: var(--btn-finish-bg); color: #fff; border-color: var(--btn-finish-bg); }
+
+  .page-wrapper {
+    padding: calc(var(--frame-height) + 30px) 20px 20px;
+    display: flex; justify-content: center;
+  }
+  .content-wrapper { width: 100%; max-width: 780px; animation: fadeIn 0.45s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+
+  .slide-image {
+    display: block; margin: 0 auto 24px;
+    max-width: 100%; width: 100%; max-height: 340px;
+    object-fit: contain; border-radius: 10px;
+  }
+
+  .text-box {
+    background: var(--box-bg); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 24px 26px; position: relative;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  }
+  .page-number {
+    position: absolute; top: -12px; right: 20px;
+    background: var(--frame-color); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .slide-text { font-size: 17px; line-height: 2; }
+
+  @media (max-width: 480px) {
+    .slide-text { font-size: 15px; }
+    .text-box { padding: 18px 16px; }
+    .nav-btn { font-size: 14px; padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-frame">
+  <div class="lesson-name" id="lessonName">—</div>
+  <button class="exit-btn" id="exitBtn">&gt;</button>
+</div>
+
+<div class="page-wrapper">
+  <div class="content-wrapper">
+    <img id="slideImage" class="slide-image" src="" alt="صورة">
+    <div class="text-box">
+      <div class="page-number" id="pageNumber">صفحة 1</div>
+      <p class="slide-text" id="slideText">—</p>
+    </div>
+  </div>
+</div>
+
+<div class="fixed-actions">
+  <button class="nav-btn prev" id="prevBtn">→ السابق</button>
+  <button class="nav-btn next" id="nextBtn">التالي ←</button>
+</div>
+
+<div class="bottom-frame"></div>
+
+<script>
+/* ============================================================
+   ⚙️ الإعدادات
+   ============================================================ */
+
+const CONFIG = {
+  lessonName: "درس الرياضيات - الفصل الأول",
+  lessonId: "lesson1",
+  stageNumber: 1,
+
+  exitUrl: "stages.html",
+  exitConfirmMessage: "هل تريد الخروج؟",
+
+  finishButtonText: "✅ انتهى",
+  finishConfirmMessage: "هل أنهيت الدرس؟",
+  finishRedirectUrl: "stages.html",
+
+  lessonsStagesKey: "lessons_stages_count",
+  solvedListKey:    "solved_lessons_list",
+
+  slides: [
+    { id: 1, image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800", text: "هذه الصفحة رقم 1." },
+    { id: 2, image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800", text: "هذه الصفحة رقم 2." },
+    { id: 3, image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800", text: "هذه الصفحة رقم 3 والأخيرة." }
+  ]
+};
+
+/* ============================================================
+   🚀 تشغيل الدرس
+   ============================================================ */
+
+document.getElementById('lessonName').textContent = CONFIG.lessonName;
+
+const img        = document.getElementById('slideImage');
+const textEl     = document.getElementById('slideText');
+const pageNumEl  = document.getElementById('pageNumber');
+const prevBtn    = document.getElementById('prevBtn');
+const nextBtn    = document.getElementById('nextBtn');
+const totalPages = CONFIG.slides.length;
+
+/* 🔑 مفتاح localStorage لحفظ رقم الصفحة */
+const PAGE_KEY = "current_page_" + CONFIG.lessonId;
+
+let currentIndex = 0;
+
+/* ============================================================
+   📄 عرض الصفحة
+   ============================================================ */
+
+function showSlide(index) {
+  const slide = CONFIG.slides[index];
+  img.src = slide.image;
+  textEl.textContent = slide.text;
+  pageNumEl.textContent = `صفحة ${slide.id}`;
+
+  prevBtn.disabled = (index === 0);
+
+  if (index === totalPages - 1) {
+    nextBtn.textContent = CONFIG.finishButtonText;
+    nextBtn.classList.add('finish');
+    nextBtn.classList.remove('next');
+  } else {
+    nextBtn.textContent = "التالي ←";
+    nextBtn.classList.add('next');
+    nextBtn.classList.remove('finish');
+  }
+
+  currentIndex = index;
+
+  /* 💾 احفظ رقم الصفحة الحالية في localStorage */
+  try {
+    localStorage.setItem(PAGE_KEY, String(index));
+  } catch(_) {}
+
+  /* 🎨 تأثير الظهور */
+  const w = document.querySelector('.content-wrapper');
+  w.style.animation = 'none'; void w.offsetWidth;
+  w.style.animation = 'fadeIn 0.45s ease';
+}
+
+/* ============================================================
+   🖱️ أزرار التنقل
+   ============================================================ */
+
+prevBtn.onclick = () => {
+  if (currentIndex > 0) showSlide(currentIndex - 1);
+};
+
+nextBtn.onclick = () => {
+  if (currentIndex < totalPages - 1) {
+    showSlide(currentIndex + 1);
+    return;
+  }
+
+  /* ✅ إنهاء الدرس */
+  if (!confirm(CONFIG.finishConfirmMessage)) return;
+
+  /* 🧹 امسح رقم الصفحة */
+  try { localStorage.removeItem(PAGE_KEY); } catch(_) {}
+
+  /* 🏆 سجّل الدرس كمكتمل */
+  markLessonAsSolved(CONFIG.lessonId);
+
+  /* 🏁 انتقل */
+  window.location.href = CONFIG.finishRedirectUrl;
+};
+
+/* ============================================================
+   🔙 زر الخروج - يرجع للصفحة 1
+   ============================================================ */
+
+document.getElementById('exitBtn').onclick = () => {
+  if (!confirm(CONFIG.exitConfirmMessage)) return;
+
+  /* 🧹 امسح رقم الصفحة → يبدأ من 1 عند العودة */
+  try {
+    localStorage.removeItem(PAGE_KEY);
+    console.log("✅ تم مسح الصفحة المحفوظة");
+  } catch(_) {}
+
+  /* 🏁 انتقل */
+  window.location.href = CONFIG.exitUrl;
+};
+
+/* ============================================================
+   🏆 تسجيل الدرس كمكتمل
+   ============================================================ */
+
+function markLessonAsSolved(lessonId) {
+  try {
+    let solvedList = [];
+    try {
+      solvedList = JSON.parse(localStorage.getItem(CONFIG.solvedListKey) || "[]");
+    } catch (_) { solvedList = []; }
+
+    if (solvedList.includes(lessonId)) {
+      console.log("🔒 تم حل هذا الدرس من قبل");
+      return;
+    }
+
+    solvedList.push(lessonId);
+    localStorage.setItem(CONFIG.solvedListKey, JSON.stringify(solvedList));
+
+    const current  = parseInt(localStorage.getItem(CONFIG.lessonsStagesKey) || "0", 10);
+    const newCount = current + 1;
+    localStorage.setItem(CONFIG.lessonsStagesKey, String(newCount));
+
+    console.log("✅ تم تسجيل الدرس:", lessonId, "| الإجمالي:", newCount);
+  } catch (e) {
+    console.error("markLessonAsSolved error:", e);
+  }
+}
+
+/* ============================================================
+   🚀 استرجاع الحالة عند الفتح
+   ============================================================ */
+
+(function init() {
+  let savedIndex = 0;
+
+  try {
+    const raw = localStorage.getItem(PAGE_KEY);
+    if (raw !== null) {
+      savedIndex = parseInt(raw, 10);
+      if (isNaN(savedIndex) || savedIndex < 0 || savedIndex >= totalPages) {
+        savedIndex = 0;
+      }
+    }
+  } catch(_) {
+    savedIndex = 0;
+  }
+
+  console.log("📖 بدء من الصفحة:", savedIndex + 1);
+  showSlide(savedIndex);
+})();
+</script>
+
+</body>
+</html>
