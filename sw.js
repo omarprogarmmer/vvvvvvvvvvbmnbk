@@ -5,7 +5,12 @@ const PRECACHE_ASSETS = [
   './',
   './index.html',
   './about.html',      // ← الصفحة الثانية
-  './manifest.json'
+  './manifest.json',
+  './g1_level1.html',
+  './g1_t1.html',
+  './g1_t2.html',
+  './profile.html',
+  './stages.html',
 ];
 
 // التثبيت: حمّل كل الملفات مرة واحدة
