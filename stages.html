@@ -22,7 +22,6 @@
 
     --line-color: #000000;
     --dot-size: 7px;
-    /* 🔽 قلّلنا عدد النقاط بزيادة المسافة بينها */
     --dot-gap: 34px;
 
     --radius: 62px;
@@ -31,6 +30,8 @@
     --swing: 78px;
 
     --divider-thickness: 8px;
+
+    --lift: -60px;
   }
 
   html, body { height: 100%; }
@@ -42,9 +43,6 @@
     touch-action: pan-y;
   }
 
-  /* ============================
-     🔝 الإطار العلوي
-     ============================ */
   .top-frame {
     position: fixed; top: 0; left: 0; right: 0;
     height: var(--frame-height);
@@ -74,9 +72,6 @@
     transform: scale(0.92);
   }
 
-  /* ============================
-     🔻 الإطار السفلي
-     ============================ */
   .bottom-frame {
     position: fixed; bottom: 0; left: 0; right: 0;
     height: var(--frame-height); background: var(--frame-color);
@@ -84,18 +79,14 @@
     box-shadow: 0 -3px 12px rgba(0,0,0,0.2);
   }
 
-  /* ============================
-     🗺️ حاوية الخريطة
-     ============================ */
   .map-container {
     position: relative;
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: calc(var(--frame-height) + 40px) 16px 40px;
+    padding: var(--frame-height) 16px 40px;
   }
 
-  /* 🎯 طبقة النقاط المتصلة */
   .dots-layer {
     position: absolute;
     top: 0; left: 0;
@@ -117,9 +108,6 @@
     will-change: transform;
   }
 
-  /* ============================
-     🎠 المراحل
-     ============================ */
   .stages-wrapper {
     position: relative;
     z-index: 2;
@@ -127,6 +115,7 @@
     flex-direction: column-reverse;
     gap: var(--gap-y);
     align-items: center;
+    transform: translateY(var(--lift));
   }
 
   .stage-row {
@@ -204,9 +193,6 @@
     font-family: 'Segoe UI', Tahoma, sans-serif;
   }
 
-  /* ============================
-     💬 الفقاعة المنبثقة
-     ============================ */
   .stage-popup {
     position: absolute;
     right: calc(100% + 10px);
@@ -239,10 +225,6 @@
     border-left-color: var(--stage-bg);
   }
 
-  /* ============================
-     ➖ الفاصل الأسود العريض
-     يمتد من حافة الشاشة إلى حافتها
-     ============================ */
   .thick-divider-wrap {
     position: relative;
     width: 100%;
@@ -252,21 +234,16 @@
   }
 
   .thick-divider {
-    /* استخدام fixed positioning للحصول على عرض الشاشة الكامل بدون مشاكل السكرول */
     position: relative;
     width: 100vw;
     height: var(--divider-thickness);
     background: var(--line-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    /* التوسيط داخل الشاشة */
     left: 50%;
     transform: translateX(-50%);
     flex-shrink: 0;
   }
 
-  /* ============================
-     📱 وسائط الجوال
-     ============================ */
   @media (max-width: 380px) {
     :root {
       --radius: 54px;
@@ -275,6 +252,7 @@
       --dot-size: 6px;
       --dot-gap: 30px;
       --divider-thickness: 6px;
+      --lift: -50px;
     }
     .stage-circle { font-size: 20px; }
     .stage-circle.current::after { font-size: 26px; }
@@ -290,6 +268,7 @@
       --dot-size: 5px;
       --dot-gap: 26px;
       --divider-thickness: 5px;
+      --lift: -40px;
     }
     .stage-circle { font-size: 18px; border-width: 3px; }
     .stage-circle.current::after { font-size: 22px; }
@@ -322,16 +301,16 @@ const CONFIG = {
   totalStages: 20,
   dividerEvery: 5,
 
-  exitUrl: "index.html",/*رابط الخروج */
+  exitUrl: "index.html",
   exitConfirmMessage: "هل تريد الخروج؟",
 
   lessonsKey:   "lessons_stages_count",
   exercisesKey: "exercises_stages_count",
 
   stageLinks: {
-    1:  "lesson1.html",
-    2:  "drag1.html",
-    3:  "drag2.html",
+    1:  "g1_level1.html",
+    2:  "g1_t1.html",
+    3:  "g1_t2.html",
     4:  "drag3.html",
     5:  "drag4.html",
     6:  "drag5.html",
@@ -432,7 +411,6 @@ function buildStages() {
       handleStageClick(i, state, popup);
     });
 
-    /* ➖ الفاصل يلفّ الشاشة كاملة */
     if (i % CONFIG.dividerEvery === 0 && i < CONFIG.totalStages) {
       const dividerWrap = document.createElement("div");
       dividerWrap.className = "thick-divider-wrap";
@@ -471,7 +449,7 @@ function handleStageClick(index, state, popup) {
 }
 
 /* ============================================================
-   🔵 رسم النقاط المتصلة عبر المراحل
+   🔵 رسم النقاط المتصلة
    ============================================================ */
 
 function drawDots() {
@@ -485,7 +463,6 @@ function drawDots() {
 
   const containerRect = container.getBoundingClientRect();
 
-  /* 📍 مركز كل دائرة داخل الحاوية */
   const points = circles.map((circle, idx) => {
     const rect = circle.getBoundingClientRect();
     return {
@@ -501,7 +478,6 @@ function drawDots() {
     getComputedStyle(document.documentElement).getPropertyValue('--dot-gap')
   ) || 34;
 
-  /* 🔗 المسار يمر عبر جميع المراحل */
   for (let i = 0; i < points.length - 1; i++) {
     const p1 = points[i];
     const p2 = points[i + 1];
@@ -510,13 +486,11 @@ function drawDots() {
     const dy = p2.y - p1.y;
     const dist = Math.hypot(dx, dy);
 
-    /* 🔽 عدد أقل من النقاط */
     const count = Math.max(1, Math.round(dist / gap));
 
     for (let d = 1; d < count; d++) {
       const t = d / count;
 
-      /* منحنى انسيابي بين المرحلتين */
       const midY = (p1.y + p2.y) / 2;
       const x = cubicBezier(p1.x, p1.x, p2.x, p2.x, t);
       const y = cubicBezier(p1.y, midY, midY, p2.y, t);
@@ -537,11 +511,24 @@ function cubicBezier(p0, p1, p2, p3, t) {
 }
 
 /* ============================================================
-   📜 التمرير التلقائي للأسفل
+   🎯 الانتقال التلقائي للمرحلة الحالية
    ============================================================ */
 
-function scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+function scrollToCurrentStage() {
+  const currentCircle = document.querySelector(".stage-circle.current");
+
+  if (!currentCircle) {
+    // كل المراحل مكتملة → اذهب للأعلى (المرحلة الأخيرة)
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  const rect = currentCircle.getBoundingClientRect();
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  // ضع المرحلة الحالية في منتصف الشاشة
+  const targetY = rect.top + scrollTop - (window.innerHeight / 2) + (rect.height / 2);
+
+  window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
 }
 
 /* ============================================================
@@ -549,7 +536,9 @@ function scrollToBottom() {
    ============================================================ */
 
 buildStages();
-setTimeout(scrollToBottom, 400);
+
+/* 🔽 عند فتح الصفحة → انتقل للمرحلة الحالية (أول مرحلة غير محلولة) */
+setTimeout(scrollToCurrentStage, 500);
 
 let resizeTimer;
 window.addEventListener("resize", () => {
