@@ -3,6 +3,7 @@ const CACHE_NAME = 'my-app-v4';
 
 const PRECACHE_ASSETS = [
   './',
+  './style_test.css',
   './index.html',
   './about.html',      // ← الصفحة الثانية
   './manifest.json',
@@ -11,6 +12,9 @@ const PRECACHE_ASSETS = [
   './g1_t2.html',
   './profile.html',
   './stages.html',
+  './script_test.js',
+
+
 ];
 
 // التثبيت: حمّل كل الملفات مرة واحدة

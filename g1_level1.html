@@ -1,15 +1,9 @@
-<!-- التعديل 
-الصور 
-النصوص
-اسم المرحلة  
-اسم الدرس 
--->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قالب الدرس</title>
+<title>تمرين السحب والإفلات</title>
 <link rel="stylesheet" href="losson.css">
 </head>
 <body>
@@ -21,26 +15,16 @@
 
 <div class="page-wrapper">
   <div class="content-wrapper">
-    <img id="slideImage" class="slide-image" src="" alt="صورة">
-    <div class="text-box">
-      <div class="page-number" id="pageNumber">الدرس الأول</div>
-      <p class="slide-text" id="slideText">—</p>
-
-      <!-- 🆕 زر الاستماع -->
-      <button class="listen-btn" id="listenBtn" type="button">
-        <span class="listen-icon">🔊</span>
-        <span class="listen-label">اسمع</span>
-      </button>
-    </div>
+    <div id="dropZone"></div>
+    <div class="divider"></div>
+    <div class="items-pool" id="itemsPool"></div>
+    <div class="result-msg" id="resultMsg"></div>
   </div>
 </div>
 
-<!-- 🆕 نص يظهر فقط في آخر صفحة -->
-<div class="final-message" id="finalMessage">(رواه:البخاري) </div>
-
 <div class="fixed-actions">
-  <button class="nav-btn prev" id="prevBtn">→ السابق</button>
-  <button class="nav-btn next" id="nextBtn">التالي ←</button>
+  <button class="nav-btn reset" id="resetBtn">🔄 إعادة</button>
+  <button class="nav-btn check" id="checkBtn">✅ تحقق</button>
 </div>
 
 <div class="bottom-frame"></div>
@@ -53,75 +37,9 @@
   <div class="win-text">أحسنت!</div>
 </div>
 
-<!-- 🎧 عنصر صوت الصفحة -->
-<audio id="slideAudio" preload="auto"></audio>
-
 <!-- 🔊 صوت الأزرار -->
 <audio id="clickSound" src="sonud/buttem.mp3" preload="auto"></audio>
 
-<script>
-/* ============================================================
-   ⚙️ الإعدادات
-   ============================================================ */
-
-const CONFIG = {
-  lessonName: "الدرس الاول ",
-  lessonId: "lesson1",
-  // stageNumber: 1,
-
-  exitUrl: "stages.html",
-  exitConfirmMessage: "هل تريد الخروج؟",
-
-  finishButtonText: "✅ انتهى",
-  finishConfirmMessage: "",
-  finishRedirectUrl: "stages.html",
-
-  /* 🎉 إعدادات الفوز */
-  winText: "أحسنت!",
-  winDuration: 2000,
-
-  lessonsStagesKey: "lessons_stages_count",
-  solvedListKey:    "solved_lessons_list",
-
-  slides: [
-    { 
-      id: 1, 
-      image: "photo/d.png", 
-      text: "<<عني النبيﷺ:في الجنة ثمانية أبواب ",
-      audio: "sonud/buttem.mp3"
-    },
-    { 
-      id: 2, 
-      image: "photo/d1.png", 
-      text: "فيها باب يسمى الريان ,",
-      audio: "sonud/page2.mp3"
-    },
-    { 
-      id: 3, 
-      image: "photo/f1_1.png", 
-      text: "لا يدخل إلا الصائمون>>,",
-      audio: "sonud/page3.mp3"
-    }
-  ]
-};
-</script>
-
 <script src="losson.js"></script>
-
-<!-- 🔊 صوت لكل الأزرار -->
-<script>
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn || btn.disabled) return;
-    /* 🚫 لا تشغّل صوت الزر لزر الاستماع */
-    if (btn.id === 'listenBtn') return;
-
-    const s = document.getElementById('clickSound');
-    if (!s) return;
-    s.currentTime = 0;
-    s.play().catch(() => {});
-  }, true);
-</script>
-
 </body>
 </html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الملف الشخصي</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent; }
 
   :root {
     --bg-page: #f5f3ee;
@@ -27,6 +27,87 @@
     background: var(--bg-page);
     color: var(--text-color);
     padding-bottom: 120px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ============================================================
+     🎨 الخلفية المتحركة (الفقاعات + الأشكال)
+     ============================================================ */
+  .animated-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(135deg, #f5f3ee 0%, #ece7db 50%, #f5f3ee 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 14s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* الفقاعات الصاعدة */
+  .animated-bg .bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%,
+                rgba(46, 125, 50, 0.15),
+                rgba(46, 125, 50, 0.05));
+    border: 1px solid rgba(46, 125, 50, 0.1);
+    animation: floatUp linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(100vh) scale(0.6) rotate(0deg);
+      opacity: 0;
+    }
+    10% { opacity: 1; }
+    90% { opacity: 0.8; }
+    100% {
+      transform: translateY(-20vh) scale(1.15) rotate(180deg);
+      opacity: 0;
+    }
+  }
+
+  /* أشكال هندسية دوارة */
+  .animated-bg .shape {
+    position: absolute;
+    border: 2px solid rgba(13, 71, 161, 0.06);
+    animation: rotateShape linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes rotateShape {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* دوائر متوسعة (Pulse) */
+  .animated-bg .pulse-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(46, 125, 50, 0.08);
+    animation: pulseRing 6s ease-out infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes pulseRing {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
   }
 
   /* 🟢 الشريط العلوي */
@@ -72,6 +153,8 @@
   }
 
   .page-wrapper {
+    position: relative;
+    z-index: 1;
     padding: calc(var(--frame-height) + 30px) 20px 20px;
     display: flex; justify-content: center;
   }
@@ -92,6 +175,8 @@
     box-shadow: 0 4px 18px rgba(0,0,0,0.06);
     text-align: center;
     margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
   }
 
   .avatar-wrapper {
@@ -195,6 +280,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
+    position: relative;
+    z-index: 2;
   }
 
   .stat-box {
@@ -257,6 +344,9 @@
 </head>
 <body>
 
+<!-- 🎨 الخلفية المتحركة -->
+<div class="animated-bg" id="animatedBg"></div>
+
 <div class="top-frame">
   <div class="profile-title">👤 الملف الشخصي</div>
   <button class="finish-btn" id="finishBtn">&gt;</button>
@@ -303,6 +393,55 @@
 
 <script>
 /* ============================================================
+   🎨 الخلفية المتحركة (فقاعات + أشكال + نبضات)
+   ============================================================ */
+function createAnimatedBackground() {
+  const bg = document.getElementById("animatedBg");
+
+  // 1️⃣ فقاعات صاعدة
+  for (let i = 0; i < 15; i++) {
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    const size = 30 + Math.random() * 100;
+    bubble.style.width = size + "px";
+    bubble.style.height = size + "px";
+    bubble.style.left = Math.random() * 100 + "%";
+    bubble.style.animationDuration = (14 + Math.random() * 20) + "s";
+    bubble.style.animationDelay = (Math.random() * 18) + "s";
+    bg.appendChild(bubble);
+  }
+
+  // 2️⃣ أشكال هندسية دوارة
+  for (let i = 0; i < 6; i++) {
+    const shape = document.createElement("div");
+    shape.className = "shape";
+    const size = 50 + Math.random() * 90;
+    shape.style.width = size + "px";
+    shape.style.height = size + "px";
+    shape.style.left = (5 + Math.random() * 90) + "%";
+    shape.style.top = (5 + Math.random() * 90) + "%";
+    shape.style.borderRadius = Math.random() > 0.5 ? "50%" : "12%";
+    shape.style.animationDuration = (25 + Math.random() * 30) + "s";
+    shape.style.animationDelay = (Math.random() * 10) + "s";
+    bg.appendChild(shape);
+  }
+
+  // 3️⃣ دوائر متوسعة (Pulse Rings)
+  for (let i = 0; i < 5; i++) {
+    const pulse = document.createElement("div");
+    pulse.className = "pulse-circle";
+    const size = 40 + Math.random() * 60;
+    pulse.style.width = size + "px";
+    pulse.style.height = size + "px";
+    pulse.style.left = (10 + Math.random() * 80) + "%";
+    pulse.style.top = (10 + Math.random() * 80) + "%";
+    pulse.style.animationDuration = (5 + Math.random() * 4) + "s";
+    pulse.style.animationDelay = (Math.random() * 6) + "s";
+    bg.appendChild(pulse);
+  }
+}
+
+/* ============================================================
    ⚙️ الإعدادات
    ============================================================ */
 
@@ -334,9 +473,7 @@ const CONFIG = {
    ============================================================ */
 
 document.getElementById("finishBtn").onclick = () => {
-  if (confirm(CONFIG.finishConfirmMessage)) {
-    window.location.href = CONFIG.finishUrl;
-  }
+  window.location.href = CONFIG.finishUrl;
 };
 
 /* ============================================================
@@ -535,6 +672,7 @@ async function refreshStats() {
 }
 
 (async () => {
+  createAnimatedBackground();
   loadPlayerData();
   await refreshStats();
 

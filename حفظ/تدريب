@@ -3,25 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>قالب الدرس</title>
+<title>تمرين السحب والإفلات</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
 
 :root {
-  --bg-page: #f5f3ee;
+  --bg-page: #f0e8d8;
   --text-color: #3d3d3d;
-  --border-color: #e0dbd0;
-  --box-bg: #ffffff;
-  --btn-bg: #ffffff;
-  --btn-text: #4a4a4a;
-  --btn-border: #c9c2b5;
-  --btn-next-bg: #3a4a3f;
-  --btn-next-text: #ffffff;
-  --btn-finish-bg: #2e7d32;
+
   --frame-color: #2e7d32;
   --frame-height: 50px;
   --frame-text: #ffffff;
   --exit-text: #cccccc;
+
+  --drop-bg: #5cb85c;
+  --item-bg: #1b5e20;
+  --item-text: #ffffff;
+
+  --cream-color: #f5e6c8;
+
+  --label-color: #1b3a1f;
+  --label-weight: 800;
+  --label-size: 18px;
+
+  --divider-color: #000000;
+  --divider-height: 2px;
+
+  --reset-bg: #c62828;
+  --reset-text: #ffffff;
 }
 
 html, body { height: 100%; }
@@ -43,18 +52,26 @@ body {
 .lesson-name { font-size: 16px; font-weight: 700; color: var(--frame-text); }
 
 .exit-btn {
-  width: 38px; height: 38px; padding: 0;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   background: transparent;
   color: var(--exit-text);
   border: 2px solid var(--exit-text);
   border-radius: 50%;
-  font-size: 22px; font-weight: 900; line-height: 1;
-  cursor: pointer; transition: 0.25s;
-  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: Arial, sans-serif;
 }
 .exit-btn:hover {
-  color: #ffffff; border-color: #ffffff;
+  color: #ffffff;
+  border-color: #ffffff;
   background: rgba(255,255,255,0.15);
 }
 
@@ -68,71 +85,296 @@ body {
   position: fixed; bottom: var(--frame-height); left: 0; right: 0;
   background: var(--bg-page); padding: 12px 22px;
   display: flex; justify-content: center; gap: 14px;
-  z-index: 998; border-top: 1px solid var(--border-color);
+  z-index: 998; border-top: 1px solid #d0c8b8;
 }
 
 .nav-btn {
   flex: 1; max-width: 320px; padding: 12px 20px;
-  border: 1.5px solid var(--btn-border); border-radius: 8px;
+  border: 1.5px solid #c9c2b5; border-radius: 8px;
   font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: 0.25s; background: var(--btn-bg); color: var(--btn-text);
+  transition: 0.25s; background: #fff; color: #4a4a4a;
 }
-.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.nav-btn.next { background: var(--btn-next-bg); color: var(--btn-next-text); border-color: var(--btn-next-bg); }
-.nav-btn.finish { background: var(--btn-finish-bg); color: #fff; border-color: var(--btn-finish-bg); }
 
-/* 🆕 نص آخر صفحة (روه:333) */
-.final-message {
-  position: fixed;
-  bottom: calc(var(--frame-height) + 80px);
-  left: 0; right: 0;
-  text-align: center;
-  font-size: 20px;
-  font-weight: 800;
-  color: #c62828;
-  letter-spacing: 0.5px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  pointer-events: none;
-  z-index: 997;
+.nav-btn.reset {
+  background: var(--reset-bg); color: var(--reset-text);
+  border-color: var(--reset-bg);
 }
-.final-message.show {
-  opacity: 1;
-  transform: translateY(0);
+.nav-btn.reset:hover { opacity: 0.9; }
+
+.nav-btn.check {
+  background: var(--item-bg); color: #fff; border-color: var(--item-bg);
 }
+.nav-btn.check:hover { opacity: 0.9; }
 
 .page-wrapper {
-  padding: calc(var(--frame-height) + 30px) 20px 20px;
+  padding: calc(var(--frame-height) + 20px) 20px 20px;
   display: flex; justify-content: center;
 }
-.content-wrapper { width: 100%; max-width: 780px; animation: fadeIn 0.45s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
-
-.slide-image {
-  display: block; margin: 0 auto 24px;
-  max-width: 100%; width: 100%; max-height: 340px;
-  object-fit: contain; border-radius: 10px;
+.content-wrapper {
+  width: 100%; max-width: 780px;
+  animation: fadeIn 0.45s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.text-box {
-  background: var(--box-bg); border: 1px solid var(--border-color);
-  border-radius: 14px; padding: 24px 26px; position: relative;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+.question-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  direction: rtl;
 }
-.page-number {
-  position: absolute; top: -12px; right: 20px;
-  background: var(--frame-color); color: #fff;
-  font-size: 12px; font-weight: 700;
-  padding: 4px 12px; border-radius: 20px;
+
+.question-label {
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  color: var(--label-color);
+  text-align: right;
+  line-height: 1.3;
+  letter-spacing: 0.3px;
 }
-.slide-text { font-size: 17px; line-height: 2; }
+
+.drop-slot {
+  background: var(--drop-bg);
+  border-radius: 8px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: 0.25s;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.drop-slot.filled {
+  background: var(--cream-color);
+}
+
+.drop-slot.drag-over {
+  background: #4cae4c;
+  transform: scale(1.02);
+}
+
+.divider {
+  height: var(--divider-height);
+  background: var(--divider-color);
+  margin: 24px 0;
+  width: 100%;
+}
+
+.items-pool {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 10px;
+  min-height: 100px;
+  border-radius: 12px;
+}
+
+.item-slot {
+  height: 46px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.drag-item {
+  background: var(--item-bg);
+  color: var(--item-text);
+  height: 46px;
+  width: 100%;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: grab;
+  user-select: none;
+  transition: 0.2s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  touch-action: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drag-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.22);
+}
+
+.drag-item:active {
+  cursor: grabbing;
+  transform: scale(1.04);
+}
+
+.drag-item.dragging { opacity: 0.5; }
+
+.item-slot.taken .drag-item {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(60%);
+}
+
+.drop-slot .drag-item {
+  height: 100%;
+  width: 100%;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin: 0;
+  box-shadow: none;
+  cursor: grab;
+}
+
+.drop-slot .drag-item:hover {
+  transform: none;
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+.result-msg {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 20px;
+  height: 24px;
+  color: var(--item-bg);
+}
+.result-msg.error { color: #c62828; }
+
+/* ============================================================
+   🎉 تأثير الفوز (Win Overlay)
+   ============================================================ */
+
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 40, 20, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.win-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.win-icon {
+  font-size: 100px;
+  line-height: 1;
+  color: #ffd54f;
+  text-shadow:
+    0 0 20px rgba(255, 213, 79, 0.8),
+    0 0 40px rgba(255, 213, 79, 0.5);
+  transform: scale(0) rotate(-180deg);
+  animation: winPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes winPop {
+  0%   { transform: scale(0) rotate(-180deg); }
+  60%  { transform: scale(1.25) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.win-text {
+  margin-top: 24px;
+  font-size: 34px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: winTextIn 0.6s ease 0.35s forwards;
+}
+
+@keyframes winTextIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.win-rings {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 213, 79, 0.6);
+  animation: ringExpand 1.4s ease-out infinite;
+  pointer-events: none;
+}
+.win-rings.delay { animation-delay: 0.4s; }
+
+@keyframes ringExpand {
+  0%   { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 16px;
+  top: -20px;
+  opacity: 0.95;
+  animation: confettiFall linear forwards;
+  pointer-events: none;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0.4;
+  }
+}
 
 @media (max-width: 480px) {
-  .slide-text { font-size: 15px; }
-  .text-box { padding: 18px 16px; }
-  .nav-btn { font-size: 14px; padding: 10px 16px; }
-  .final-message { font-size: 17px; }
+  .question-row { grid-template-columns: 130px 1fr; gap: 10px; margin-bottom: 14px; }
+  .question-label { font-size: 15px; }
+  .drop-slot      { height: 44px; font-size: 13px; }
+  .item-slot      { height: 42px; }
+  .drag-item      { height: 42px; padding: 0 14px; font-size: 13px; }
+  .drop-slot .drag-item { font-size: 12px; padding: 0 6px; }
+  .items-pool { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .win-icon { font-size: 78px; }
+  .win-text { font-size: 26px; }
+}
+
+@media (max-width: 360px) {
+  .question-row   { grid-template-columns: 110px 1fr; gap: 8px; }
+  .question-label { font-size: 14px; }
+  .drop-slot      { height: 40px; font-size: 12px; }
+  .item-slot      { height: 38px; }
+  .drag-item      { height: 38px; font-size: 12px; padding: 0 10px; }
+  .drop-slot .drag-item { font-size: 11px; }
+  .items-pool { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
 </style>
 </head>
@@ -145,23 +387,30 @@ body {
 
 <div class="page-wrapper">
   <div class="content-wrapper">
-    <img id="slideImage" class="slide-image" src="" alt="صورة">
-    <div class="text-box">
-      <div class="page-number" id="pageNumber">صفحة 1</div>
-      <p class="slide-text" id="slideText">—</p>
-    </div>
+    <div id="dropZone"></div>
+    <div class="divider"></div>
+    <div class="items-pool" id="itemsPool"></div>
+    <div class="result-msg" id="resultMsg"></div>
   </div>
 </div>
 
-<!-- 🆕 نص يظهر فقط في آخر صفحة -->
-<div class="final-message" id="finalMessage">روه:333</div>
-
 <div class="fixed-actions">
-  <button class="nav-btn prev" id="prevBtn">→ السابق</button>
-  <button class="nav-btn next" id="nextBtn">التالي ←</button>
+  <button class="nav-btn reset" id="resetBtn">🔄 إعادة</button>
+  <button class="nav-btn check" id="checkBtn">✅ تحقق</button>
 </div>
 
 <div class="bottom-frame"></div>
+
+<!-- 🎉 طبقة الفوز -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-rings"></div>
+  <div class="win-rings delay"></div>
+  <div class="win-icon">🏆</div>
+  <div class="win-text">أحسنت!</div>
+</div>
+
+<!-- 🔊 صوت الأزرار -->
+<audio id="clickSound" src="sonud/buttem.mp3" preload="auto"></audio>
 
 <script>
 /* ============================================================
@@ -169,182 +418,508 @@ body {
    ============================================================ */
 
 const CONFIG = {
-  lessonName: "درس الرياضيات - الفصل الأول",
-  lessonId: "lesson1",
-  stageNumber: 1,
+  id: "فضل الصيام_التدريب الأول ",
+  stageNumber: 3,
 
   exitUrl: "stages.html",
   exitConfirmMessage: "هل تريد الخروج؟",
 
-  finishButtonText: "✅ انتهى",
-  finishConfirmMessage: "",        /* 🔕 فارغة → لا تظهر رسالة تأكيد */
-  finishRedirectUrl: "stages.html",
+  exercisesStagesKey: "exercises_stages_count",
+  solvedListKey:      "solved_exercises_list",
 
-  lessonsStagesKey: "lessons_stages_count",
-  solvedListKey:    "solved_lessons_list",
+  items: [
+    { id: "item_1", text: "في الجنة ثمانيةأبواب",  label: "عني النبيﷺ :" },
+    { id: "item_2", text: "يسمى الريان ",          label: "فيها " },
+    { id: "item_3", text: "إلا الصائمون",          label: "لايدخله" },
+  ],
 
-  slides: [
-    { id: 1, image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800", text: "هذه الصفحة رقم 1." },
-    { id: 2, image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800", text: "هذه الصفحة رقم 2." },
-    { id: 3, image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800", text: "هذه الصفحة رقم 3 والأخيرة." }
-  ]
+  successMessage: "✅ أحسنت! كل الإجابات صحيحة",
+  emptyMessage:   "⚠️ املأ كل المربعات أولاً",
+  retryMessage:   "❌ حاول مرة أخرى",
+
+  resetConfirmMessage: "",
+
+  successRedirectUrl: "stages.html",
+  successRedirectDelay: 2000,
+
+  winText: "أحسنت!",
+  winDuration: 2000,
 };
 
 /* ============================================================
-   🚀 تشغيل الدرس
+   🧠 منطق التطبيق — سحب وإفلات، تحقق، فوز
    ============================================================ */
 
-document.getElementById('lessonName').textContent = CONFIG.lessonName;
+(function() {
+  const dropZone   = document.getElementById('dropZone');
+  const itemsPool  = document.getElementById('itemsPool');
+  const resultMsg  = document.getElementById('resultMsg');
+  const resetBtn   = document.getElementById('resetBtn');
+  const checkBtn   = document.getElementById('checkBtn');
+  const exitBtn    = document.getElementById('exitBtn');
+  const lessonName = document.getElementById('lessonName');
+  const winOverlay = document.getElementById('winOverlay');
+  const clickSound = document.getElementById('clickSound');
 
-const img        = document.getElementById('slideImage');
-const textEl     = document.getElementById('slideText');
-const pageNumEl  = document.getElementById('pageNumber');
-const prevBtn    = document.getElementById('prevBtn');
-const nextBtn    = document.getElementById('nextBtn');
-const finalMsg   = document.getElementById('finalMessage');
-const totalPages = CONFIG.slides.length;
+  if (lessonName) lessonName.textContent = CONFIG.id;
 
-/* 🔑 مفتاح localStorage لحفظ رقم الصفحة */
-const PAGE_KEY = "current_page_" + CONFIG.lessonId;
+  let draggedItem = null;
+  let dragSourceSlot = null;
 
-let currentIndex = 0;
+  /* ---------- بناء الواجهة ---------- */
+  function render() {
+    dropZone.innerHTML = '';
+    itemsPool.innerHTML = '';
 
-/* ============================================================
-   📄 عرض الصفحة
-   ============================================================ */
+    const shuffled = [...CONFIG.items].sort(() => Math.random() - 0.5);
 
-function showSlide(index) {
-  const slide = CONFIG.slides[index];
-  img.src = slide.image;
-  textEl.textContent = slide.text;
-  pageNumEl.textContent = `صفحة ${slide.id}`;
+    CONFIG.items.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'question-row';
 
-  prevBtn.disabled = (index === 0);
+      const label = document.createElement('div');
+      label.className = 'question-label';
+      label.textContent = item.label;
 
-  if (index === totalPages - 1) {
-    nextBtn.textContent = CONFIG.finishButtonText;
-    nextBtn.classList.add('finish');
-    nextBtn.classList.remove('next');
+      const slot = document.createElement('div');
+      slot.className = 'drop-slot';
+      slot.dataset.correctId = item.id;
+      slot.dataset.slotIndex = index;
 
-    /* 🆕 إظهار نص آخر صفحة */
-    finalMsg.classList.add('show');
-  } else {
-    nextBtn.textContent = "التالي ←";
-    nextBtn.classList.add('next');
-    nextBtn.classList.remove('finish');
+      slot.addEventListener('dragover',  handleDragOver);
+      slot.addEventListener('dragleave', handleDragLeave);
+      slot.addEventListener('drop',      handleDrop);
 
-    /* 🆕 إخفاء نص آخر صفحة */
-    finalMsg.classList.remove('show');
+      slot.addEventListener('touchstart', handleTouchStart, { passive: false });
+      slot.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+      slot.addEventListener('touchend',   handleTouchEnd);
+
+      row.appendChild(label);
+      row.appendChild(slot);
+      dropZone.appendChild(row);
+    });
+
+    shuffled.forEach(item => {
+      const slot = document.createElement('div');
+      slot.className = 'item-slot';
+      slot.dataset.itemId = item.id;
+
+      const dragEl = document.createElement('div');
+      dragEl.className = 'drag-item';
+      dragEl.textContent = item.text;
+      dragEl.draggable = true;
+      dragEl.dataset.itemId = item.id;
+
+      dragEl.addEventListener('dragstart', handleDragStart);
+      dragEl.addEventListener('dragend',   handleDragEnd);
+
+      dragEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+      dragEl.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+      dragEl.addEventListener('touchend',   handleTouchEnd);
+
+      slot.appendChild(dragEl);
+      itemsPool.appendChild(slot);
+    });
+
+    resultMsg.textContent = '';
+    resultMsg.classList.remove('error');
+    winOverlay.classList.remove('show');
   }
 
-  currentIndex = index;
+  /* ---------- ✅ تحديث حالة الفراغات والمخزون ---------- */
+  function updateSlotsState() {
+    // 1) تحديث الفراغات (drop-slot): filled إذا كان يحتوي عنصراً
+    document.querySelectorAll('.drop-slot').forEach(slot => {
+      if (slot.querySelector('.drag-item')) {
+        slot.classList.add('filled');
+      } else {
+        slot.classList.remove('filled');
+      }
+    });
 
-  /* 💾 احفظ رقم الصفحة */
-  try {
-    localStorage.setItem(PAGE_KEY, String(index));
-  } catch(_) {}
-
-  /* 🎨 تأثير الظهور */
-  const w = document.querySelector('.content-wrapper');
-  w.style.animation = 'none'; void w.offsetWidth;
-  w.style.animation = 'fadeIn 0.45s ease';
-}
-
-/* ============================================================
-   🖱️ أزرار التنقل
-   ============================================================ */
-
-prevBtn.onclick = () => {
-  if (currentIndex > 0) showSlide(currentIndex - 1);
-};
-
-nextBtn.onclick = () => {
-  if (currentIndex < totalPages - 1) {
-    showSlide(currentIndex + 1);
-    return;
+    // 2) تحديث المخزون (item-slot): taken إذا كان فارغاً (العنصر خرج منه)
+    document.querySelectorAll('.item-slot').forEach(slot => {
+      if (slot.querySelector('.drag-item')) {
+        slot.classList.remove('taken');
+      } else {
+        slot.classList.add('taken');
+      }
+    });
   }
 
-  /* ✅ إنهاء الدرس — بدون رسالة تأكيد */
-  if (CONFIG.finishConfirmMessage) {
-    if (!confirm(CONFIG.finishConfirmMessage)) return;
+  /* ---------- HTML5 Drag & Drop ---------- */
+  function handleDragStart(e) {
+    const dragEl = e.target.closest('.drag-item');
+    if (!dragEl) return;
+
+    draggedItem = dragEl;
+    dragSourceSlot = dragEl.parentElement;
+
+    e.dataTransfer.setData('text/plain', dragEl.dataset.itemId);
+    e.dataTransfer.effectAllowed = 'move';
+
+    setTimeout(() => dragEl.classList.add('dragging'), 0);
   }
 
-  /* 🧹 امسح رقم الصفحة */
-  try { localStorage.removeItem(PAGE_KEY); } catch(_) {}
+  function handleDragEnd(e) {
+    const dragEl = e.target.closest('.drag-item');
+    if (dragEl) dragEl.classList.remove('dragging');
 
-  /* 🏆 سجّل الدرس كمكتمل */
-  markLessonAsSolved(CONFIG.lessonId);
+    // ✅ الرجوع للمكان الأصلي إذا أُفلت خارج أي فراغ
+    if (dragEl && !dragEl.dataset.dropped) {
+      const itemId = dragEl.dataset.itemId;
+      const originalSlot = document.querySelector(`.item-slot[data-item-id="${itemId}"]`);
+      if (originalSlot) {
+        originalSlot.appendChild(dragEl);
+      }
+    }
 
-  /* 🏁 انتقل */
-  window.location.href = CONFIG.finishRedirectUrl;
-};
+    if (dragEl) delete dragEl.dataset.dropped;
 
-/* ============================================================
-   🔙 زر الخروج
-   ============================================================ */
+    draggedItem = null;
+    dragSourceSlot = null;
 
-document.getElementById('exitBtn').onclick = () => {
-  if (!confirm(CONFIG.exitConfirmMessage)) return;
+    document.querySelectorAll('.drop-slot.drag-over')
+      .forEach(el => el.classList.remove('drag-over'));
 
-  try {
-    localStorage.removeItem(PAGE_KEY);
-    console.log("✅ تم مسح الصفحة المحفوظة");
-  } catch(_) {}
+    // ✅ تحديث حالة جميع الفراغات
+    updateSlotsState();
+  }
 
-  window.location.href = CONFIG.exitUrl;
-};
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const slot = e.target.closest('.drop-slot');
+    if (slot) slot.classList.add('drag-over');
+  }
 
-/* ============================================================
-   🏆 تسجيل الدرس كمكتمل
-   ============================================================ */
+  function handleDragLeave(e) {
+    const slot = e.target.closest('.drop-slot');
+    if (slot) slot.classList.remove('drag-over');
+  }
 
-function markLessonAsSolved(lessonId) {
-  try {
-    let solvedList = [];
-    try {
-      solvedList = JSON.parse(localStorage.getItem(CONFIG.solvedListKey) || "[]");
-    } catch (_) { solvedList = []; }
+  function handleDrop(e) {
+    e.preventDefault();
+    const slot = e.target.closest('.drop-slot');
+    if (!slot) return;
 
-    if (solvedList.includes(lessonId)) {
-      console.log("🔒 تم حل هذا الدرس من قبل");
+    slot.classList.remove('drag-over');
+
+    const itemId = e.dataTransfer.getData('text/plain');
+    if (!itemId) return;
+
+    const dragEl = document.querySelector(`.drag-item[data-item-id="${itemId}"]`);
+    if (!dragEl) return;
+
+    placeItemInSlot(dragEl, slot);
+  }
+
+  /* ---------- Touch (للموبايل) ---------- */
+  let touchDraggedItem = null;
+  let touchOffsetX = 0, touchOffsetY = 0;
+  let touchClone = null;
+
+  function handleTouchStart(e) {
+    const dragEl = e.target.closest('.drag-item');
+    if (!dragEl) return;
+
+    e.preventDefault();
+
+    touchDraggedItem = dragEl;
+    const rect = dragEl.getBoundingClientRect();
+
+    touchOffsetX = e.touches[0].clientX - rect.left;
+    touchOffsetY = e.touches[0].clientY - rect.top;
+
+    touchClone = dragEl.cloneNode(true);
+    Object.assign(touchClone.style, {
+      position: 'fixed',
+      left: rect.left + 'px',
+      top: rect.top + 'px',
+      width: rect.width + 'px',
+      height: rect.height + 'px',
+      zIndex: '10000',
+      pointerEvents: 'none',
+      opacity: '0.8',
+      transform: 'scale(1.05)'
+    });
+    document.body.appendChild(touchClone);
+
+    dragEl.style.opacity = '0.3';
+  }
+
+  function handleTouchMove(e) {
+    if (!touchDraggedItem || !touchClone) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+    touchClone.style.top  = (touch.clientY - touchOffsetY) + 'px';
+
+    document.querySelectorAll('.drop-slot.drag-over')
+      .forEach(el => el.classList.remove('drag-over'));
+
+    const elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slot = elUnder?.closest('.drop-slot');
+    if (slot) slot.classList.add('drag-over');
+  }
+
+  function handleTouchEnd(e) {
+    if (!touchDraggedItem) return;
+
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    touchDraggedItem.style.opacity = '';
+
+    document.querySelectorAll('.drop-slot.drag-over')
+      .forEach(el => el.classList.remove('drag-over'));
+
+    const touch = e.changedTouches[0];
+    const elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slot = elUnder?.closest('.drop-slot');
+
+    if (slot) {
+      placeItemInSlot(touchDraggedItem, slot);
+    } else {
+      // ✅ الرجوع للمكان الأصلي
+      const itemId = touchDraggedItem.dataset.itemId;
+      const originalSlot = document.querySelector(`.item-slot[data-item-id="${itemId}"]`);
+      if (originalSlot) {
+        originalSlot.appendChild(touchDraggedItem);
+      }
+      updateSlotsState();
+    }
+
+    touchDraggedItem = null;
+  }
+
+  /* ---------- وضع العنصر في الخانة (مع التبديل) ---------- */
+  function placeItemInSlot(dragEl, slot) {
+    // ✅ ميزة التبديل: إذا كان الفراغ ممتلئاً، بدّل العنصرين
+    const existing = slot.querySelector('.drag-item');
+    if (existing && existing !== dragEl) {
+      const currentParent = dragEl.parentElement;
+
+      if (currentParent && currentParent.classList.contains('drop-slot')) {
+        // تبديل بين فراغين (Swap)
+        currentParent.appendChild(existing);
+      } else {
+        // العنصر قادم من المخزون → أعد الموجود لمكانه الأصلي في المخزون
+        const existingId = existing.dataset.itemId;
+        const originalSlot = document.querySelector(`.item-slot[data-item-id="${existingId}"]`);
+        if (originalSlot) {
+          originalSlot.appendChild(existing);
+        }
+      }
+    }
+
+    slot.appendChild(dragEl);
+    dragEl.dataset.dropped = 'true'; // ✅ علامة نجاح الإسقاط
+
+    draggedItem = null;
+    dragSourceSlot = null;
+
+    // ✅ تحديث حالة جميع الفراغات والمخزون
+    updateSlotsState();
+  }
+
+  /* ---------- إعادة تعيين ---------- */
+  function resetExercise() {
+    document.querySelectorAll('.drop-slot .drag-item').forEach(dragEl => {
+      const itemId = dragEl.dataset.itemId;
+      const originalSlot = document.querySelector(`.item-slot[data-item-id="${itemId}"]`);
+      if (originalSlot) {
+        originalSlot.appendChild(dragEl);
+      }
+    });
+
+    document.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('drag-over'));
+    updateSlotsState();
+
+    resultMsg.textContent = '';
+    resultMsg.classList.remove('error');
+    winOverlay.classList.remove('show');
+  }
+
+  /* ---------- التحقق ---------- */
+  function checkAnswers() {
+    const slots = document.querySelectorAll('.drop-slot');
+    let allFilled = true;
+    let allCorrect = true;
+
+    slots.forEach(slot => {
+      const dragEl = slot.querySelector('.drag-item');
+      if (!dragEl) { allFilled = false; allCorrect = false; return; }
+      if (dragEl.dataset.itemId !== slot.dataset.correctId) allCorrect = false;
+    });
+
+    if (!allFilled) {
+      resultMsg.textContent = CONFIG.emptyMessage;
+      resultMsg.classList.add('error');
       return;
     }
 
-    solvedList.push(lessonId);
-    localStorage.setItem(CONFIG.solvedListKey, JSON.stringify(solvedList));
+    if (allCorrect) {
+      resultMsg.textContent = CONFIG.successMessage;
+      resultMsg.classList.remove('error');
+      saveProgress();
+      showWinOverlay();
 
-    const current  = parseInt(localStorage.getItem(CONFIG.lessonsStagesKey) || "0", 10);
-    const newCount = current + 1;
-    localStorage.setItem(CONFIG.lessonsStagesKey, String(newCount));
-
-    console.log("✅ تم تسجيل الدرس:", lessonId, "| الإجمالي:", newCount);
-  } catch (e) {
-    console.error("markLessonAsSolved error:", e);
-  }
-}
-
-/* ============================================================
-   🚀 استرجاع الحالة عند الفتح
-   ============================================================ */
-
-(function init() {
-  let savedIndex = 0;
-
-  try {
-    const raw = localStorage.getItem(PAGE_KEY);
-    if (raw !== null) {
-      savedIndex = parseInt(raw, 10);
-      if (isNaN(savedIndex) || savedIndex < 0 || savedIndex >= totalPages) {
-        savedIndex = 0;
-      }
+      setTimeout(() => {
+        if (CONFIG.successRedirectUrl) window.location.href = CONFIG.successRedirectUrl;
+      }, CONFIG.successRedirectDelay);
+    } else {
+      resultMsg.textContent = CONFIG.retryMessage;
+      resultMsg.classList.add('error');
     }
-  } catch(_) {
-    savedIndex = 0;
   }
 
-  console.log("📖 بدء من الصفحة:", savedIndex + 1);
-  showSlide(savedIndex);
+  /* ---------- حفظ التقدم ---------- */
+  function saveProgress() {
+    try {
+      let count = parseInt(localStorage.getItem(CONFIG.exercisesStagesKey) || '0');
+      count += 1;
+      localStorage.setItem(CONFIG.exercisesStagesKey, count);
+
+      let solved = JSON.parse(localStorage.getItem(CONFIG.solvedListKey) || '[]');
+      if (!solved.includes(CONFIG.id)) {
+        solved.push(CONFIG.id);
+        localStorage.setItem(CONFIG.solvedListKey, JSON.stringify(solved));
+      }
+    } catch (e) {
+      console.warn('⚠️ لا يمكن حفظ التقدم:', e);
+    }
+  }
+
+  /* ---------- تأثير الفوز ---------- */
+  function showWinOverlay() {
+    winOverlay.classList.add('show');
+    document.querySelectorAll('.confetti').forEach(el => el.remove());
+
+    const colors = ['#ffd54f', '#ff8a65', '#4fc3f7', '#aed581', '#f06292', '#ba68c8'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + '%';
+      c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      c.style.animationDelay = (Math.random() * 1.5) + 's';
+      c.style.width  = (Math.random() * 8 + 6) + 'px';
+      c.style.height = (Math.random() * 12 + 8) + 'px';
+      winOverlay.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }
+  }
+
+  /* ---------- الأحداث ---------- */
+  resetBtn.addEventListener('click', resetExercise);
+  checkBtn.addEventListener('click', checkAnswers);
+
+  exitBtn.addEventListener('click', () => {
+    if (confirm(CONFIG.exitConfirmMessage)) {
+      window.location.href = CONFIG.exitUrl;
+    }
+  });
+
+  document.addEventListener('dragstart', (e) => {
+    if (!e.target.closest('.drag-item')) e.preventDefault();
+  });
+
+  /* 🔊 صوت لكل الأزرار */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    if (clickSound) {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+    }
+  }, true);
+
+  /* ---------- تشغيل ---------- */
+  render();
 })();
+</script>
+
+<!-- ============================================================
+     🛠️ Service Worker (my-app-v6) — مسجَّل داخلياً
+     ============================================================ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swCode = `
+const CACHE_NAME = 'my-app-v6';
+
+const PRECACHE_ASSETS = [
+  './',
+  './index.html',
+  './style_test.css',
+  './script_test.js',
+  './sonud/buttem.mp3',
+  './stages.html'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return Promise.allSettled(
+        PRECACHE_ASSETS.map(url =>
+          cache.add(url).catch(err => console.warn('⚠️ فشل تحميل:', url))
+        )
+      );
+    }).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http')) return;
+
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type === 'opaque') {
+          return response;
+        }
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      }).catch(() => {
+        const accept = event.request.headers.get('accept') || '';
+        if (accept.includes('text/html')) {
+          return caches.match(event.request).then(c => c || caches.match('./index.html'));
+        }
+        return new Response('', { status: 408, statusText: 'Offline' });
+      });
+    })
+  );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'KEEP_ALIVE') {
+    console.log('💚 Service Worker نشط');
+  }
+});
+    `;
+
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+
+    navigator.serviceWorker.register(swUrl)
+      .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
+      .catch(err => console.warn('⚠️ فشل تسجيل Service Worker:', err));
+  });
+}
 </script>
 
 </body>

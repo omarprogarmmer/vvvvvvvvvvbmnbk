@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-app-v6';
+const CACHE_NAME = 'my-app-v4';
 
 const PRECACHE_ASSETS = [
   

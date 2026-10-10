@@ -41,8 +41,89 @@
     padding-bottom: 100px;
     overflow-x: hidden;
     touch-action: pan-y;
+    position: relative;
   }
 
+  /* ============================================================
+     🎨 الخلفية المتحركة (فقاعات + أشكال + نبضات)
+     ============================================================ */
+  .animated-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(135deg, #f0e8d8 0%, #e8dcc8 50%, #f0e8d8 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 14s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* الفقاعات الصاعدة */
+  .animated-bg .bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%,
+                rgba(46, 125, 50, 0.15),
+                rgba(46, 125, 50, 0.05));
+    border: 1px solid rgba(46, 125, 50, 0.1);
+    animation: floatUp linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(100vh) scale(0.6) rotate(0deg);
+      opacity: 0;
+    }
+    10% { opacity: 1; }
+    90% { opacity: 0.8; }
+    100% {
+      transform: translateY(-20vh) scale(1.15) rotate(180deg);
+      opacity: 0;
+    }
+  }
+
+  /* أشكال هندسية دوارة */
+  .animated-bg .shape {
+    position: absolute;
+    border: 2px solid rgba(13, 71, 161, 0.06);
+    animation: rotateShape linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes rotateShape {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* دوائر متوسعة (Pulse) */
+  .animated-bg .pulse-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(46, 125, 50, 0.08);
+    animation: pulseRing 6s ease-out infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes pulseRing {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  /* ====== الإطار العلوي ====== */
   .top-frame {
     position: fixed; top: 0; left: 0; right: 0;
     height: var(--frame-height);
@@ -72,6 +153,7 @@
     transform: scale(0.92);
   }
 
+  /* ====== الإطار السفلي ====== */
   .bottom-frame {
     position: fixed; bottom: 0; left: 0; right: 0;
     height: var(--frame-height); background: var(--frame-color);
@@ -79,14 +161,17 @@
     box-shadow: 0 -3px 12px rgba(0,0,0,0.2);
   }
 
+  /* ====== حاوية الخريطة ====== */
   .map-container {
     position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
     padding: var(--frame-height) 16px 40px;
   }
 
+  /* ====== طبقة النقاط ====== */
   .dots-layer {
     position: absolute;
     top: 0; left: 0;
@@ -108,6 +193,7 @@
     will-change: transform;
   }
 
+  /* ====== حاوية المراحل ====== */
   .stages-wrapper {
     position: relative;
     z-index: 2;
@@ -126,6 +212,7 @@
     transform: translateX(var(--row-offset, 0px));
   }
 
+  /* ====== دائرة المرحلة ====== */
   .stage-circle {
     width: var(--radius);
     height: var(--radius);
@@ -277,6 +364,9 @@
 </head>
 <body>
 
+<!-- 🎨 الخلفية المتحركة -->
+<div class="animated-bg" id="animatedBg"></div>
+
 <div class="top-frame">
   <div class="page-title">🗺️ خريطة المراحل</div>
   <button class="exit-btn" id="exitBtn">&gt;</button>
@@ -293,6 +383,55 @@
 <div class="bottom-frame"></div>
 
 <script>
+/* ============================================================
+   🎨 الخلفية المتحركة (فقاعات + أشكال + نبضات)
+   ============================================================ */
+function createAnimatedBackground() {
+  const bg = document.getElementById("animatedBg");
+
+  // 1️⃣ فقاعات صاعدة
+  for (let i = 0; i < 15; i++) {
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    const size = 30 + Math.random() * 100;
+    bubble.style.width = size + "px";
+    bubble.style.height = size + "px";
+    bubble.style.left = Math.random() * 100 + "%";
+    bubble.style.animationDuration = (14 + Math.random() * 20) + "s";
+    bubble.style.animationDelay = (Math.random() * 18) + "s";
+    bg.appendChild(bubble);
+  }
+
+  // 2️⃣ أشكال هندسية دوارة
+  for (let i = 0; i < 6; i++) {
+    const shape = document.createElement("div");
+    shape.className = "shape";
+    const size = 50 + Math.random() * 90;
+    shape.style.width = size + "px";
+    shape.style.height = size + "px";
+    shape.style.left = (5 + Math.random() * 90) + "%";
+    shape.style.top = (5 + Math.random() * 90) + "%";
+    shape.style.borderRadius = Math.random() > 0.5 ? "50%" : "12%";
+    shape.style.animationDuration = (25 + Math.random() * 30) + "s";
+    shape.style.animationDelay = (Math.random() * 10) + "s";
+    bg.appendChild(shape);
+  }
+
+  // 3️⃣ دوائر متوسعة (Pulse Rings)
+  for (let i = 0; i < 5; i++) {
+    const pulse = document.createElement("div");
+    pulse.className = "pulse-circle";
+    const size = 40 + Math.random() * 60;
+    pulse.style.width = size + "px";
+    pulse.style.height = size + "px";
+    pulse.style.left = (10 + Math.random() * 80) + "%";
+    pulse.style.top = (10 + Math.random() * 80) + "%";
+    pulse.style.animationDuration = (5 + Math.random() * 4) + "s";
+    pulse.style.animationDelay = (Math.random() * 6) + "s";
+    bg.appendChild(pulse);
+  }
+}
+
 /* ============================================================
    ⚙️ الإعدادات
    ============================================================ */
@@ -336,9 +475,7 @@ const CONFIG = {
    ============================================================ */
 
 document.getElementById("exitBtn").onclick = () => {
-  if (confirm(CONFIG.exitConfirmMessage)) {
-    window.location.href = CONFIG.exitUrl;
-  }
+  window.location.href = CONFIG.exitUrl;
 };
 
 /* ============================================================
@@ -518,14 +655,12 @@ function scrollToCurrentStage() {
   const currentCircle = document.querySelector(".stage-circle.current");
 
   if (!currentCircle) {
-    // كل المراحل مكتملة → اذهب للأعلى (المرحلة الأخيرة)
     window.scrollTo({ top: 0, behavior: "smooth" });
     return;
   }
 
   const rect = currentCircle.getBoundingClientRect();
   const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  // ضع المرحلة الحالية في منتصف الشاشة
   const targetY = rect.top + scrollTop - (window.innerHeight / 2) + (rect.height / 2);
 
   window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
@@ -535,9 +670,9 @@ function scrollToCurrentStage() {
    🚀 التشغيل
    ============================================================ */
 
+createAnimatedBackground();
 buildStages();
 
-/* 🔽 عند فتح الصفحة → انتقل للمرحلة الحالية (أول مرحلة غير محلولة) */
 setTimeout(scrollToCurrentStage, 500);
 
 let resizeTimer;

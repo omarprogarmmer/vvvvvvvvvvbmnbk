@@ -202,7 +202,7 @@ nextBtn.onclick = () => {
    ============================================================ */
 
 document.getElementById('exitBtn').onclick = () => {
-  if (!confirm(CONFIG.exitConfirmMessage)) return;
+  window.location.href = CONFIG.exitUrl;
 
   /* 🛑 أوقف الصوت عند الخروج */
   try {
