@@ -8,11 +8,13 @@
 </head>
 <body>
 
+<!-- 🟢 الشريط العلوي -->
 <div class="top-frame">
   <div class="lesson-name" id="lessonName">—</div>
   <button class="exit-btn" id="exitBtn">&gt;</button>
 </div>
 
+<!-- 📄 محتوى الصفحة -->
 <div class="page-wrapper">
   <div class="content-wrapper">
     <div id="dropZone"></div>
@@ -22,6 +24,7 @@
   </div>
 </div>
 
+<!-- 🎛️ الأزرار الثابتة -->
 <div class="fixed-actions">
   <button class="nav-btn reset" id="resetBtn">🔄 إعادة</button>
   <button class="nav-btn check" id="checkBtn">✅ تحقق</button>
@@ -37,11 +40,11 @@
   <div class="win-text">أحسنت!</div>
 </div>
 
-<script>
-/* ============================================================
-   ⚙️ الإعدادات
-   ============================================================ */
+<!-- 🔊 صوت الأزرار -->
+<audio id="clickSound" src="sonud/buttem.mp3" preload="auto"></audio>
 
+<!-- ⚙️ الإعدادات (CONFIG) — قبل السكربت -->
+<script>
 const CONFIG = {
   id: "فضل الصيام_التدريب الأول ",
   stageNumber: 3,
@@ -53,10 +56,9 @@ const CONFIG = {
   solvedListKey:      "solved_exercises_list",
 
   items: [
-    { id: "item_1", text: "في الجنة ثمانيةأبواب",      label: "عني النبيﷺ :" },
-    { id: "item_2", text: "يسمى الريان ",        label: "فيها " },
-    { id: "item_3", text: "إلا الصائمون",      label: "لايدخله" },
-    // { id: "item_4", text: "الرحمة",       label: "الركن الرابع:" },
+    { id: "item_1", text: "في الجنة ثمانيةأبواب",  label: "عني النبيﷺ :" },
+    { id: "item_2", text: "يسمى الريان ",          label: "فيها " },
+    { id: "item_3", text: "إلا الصائمون",          label: "لايدخله" },
   ],
 
   successMessage: "✅ أحسنت! كل الإجابات صحيحة",
@@ -68,32 +70,13 @@ const CONFIG = {
   successRedirectUrl: "stages.html",
   successRedirectDelay: 2000,
 
-  /* 🎉 إعدادات الفوز */
   winText: "أحسنت!",
   winDuration: 2000,
 };
 </script>
 
-<script src="sw.js"></script>
-
-
-
-
-<!-- 🔊 صوت لكل الأزرار -->
-<audio id="clickSound" src="sonud/buttem.mp3" preload="auto"></audio>
-<script>
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn || btn.disabled) return;
-    const s = document.getElementById('clickSound');
-    s.currentTime = 0;
-    s.play().catch(() => {});
-  }, true);
-
-
-</script>
-
-
+<!-- 🚀 منطق التطبيق -->
+<script src="script_test.js"></script>
 
 </body>
 </html>

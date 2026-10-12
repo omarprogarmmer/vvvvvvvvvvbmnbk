@@ -1,11 +1,22 @@
-// ⚠️ غيّر الرقم إلى v4 عند أي تعديل
-const CACHE_NAME = 'my-app-v4';
+// ============================================
+// Service Worker - my-app-v4
+// ============================================
+
+const CACHE_NAME = 'my-app-v4'; // ← غيّر الرقم عند كل تحديث
 
 const PRECACHE_ASSETS = [
-  './',
+  './losson.css',
   './style_test.css',
+  './losson.js',
+  'photo/Built in Silence.jpg',
+  'photo/d.png',
+  'photo/d1.png',
+  'photo/f1_1.png',
+  'photo/SnapBG.ai_1788007924138.png',
+  'photo/SnapBG.ai_1788007926352.png',
+
   './index.html',
-  './about.html',      // ← الصفحة الثانية
+  './about.html',
   './manifest.json',
   './g1_level1.html',
   './g1_t1.html',
@@ -13,11 +24,11 @@ const PRECACHE_ASSETS = [
   './profile.html',
   './stages.html',
   './script_test.js',
-
-
 ];
 
-// التثبيت: حمّل كل الملفات مرة واحدة
+// ============================================
+// 1) التثبيت: حمّل كل الملفات مرة واحدة
+// ============================================
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -26,78 +37,70 @@ self.addEventListener('install', event => {
   );
 });
 
-// التفعيل: احذف الكاش القديم
+// ============================================
+// 2) التفعيل: احذف كل الكاش القديم
+// ============================================
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => {
+        return Promise.all(
+          keys
+            .filter(key => key !== CACHE_NAME)   // احتفظ بالكاش الحالي فقط
+            .map(key => {
+              console.log('🗑️ حذف الكاش القديم:', key);
+              return caches.delete(key);         // ← حذف الكاش
+            })
+        );
+      })
+      .then(() => self.clients.claim())
   );
 });
 
-// الجلب: cache-first مع احتياطي عند الفشل
+// ============================================
+// 3) الجلب: cache-first مع تحديث تلقائي
+// ============================================
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  // تجاهل طلبات chrome-extension وغيرها
-  if (!event.request.url.startsWith('http')) return;
-
   event.respondWith(
     caches.match(event.request).then(cached => {
-
-      // ✅ الموجود في الكاش يُعاد مباشرة
       if (cached) return cached;
 
-      return fetch(event.request).then(response => {
-        // لا تخزّن الاستجابات غير الصالحة
-        if (!response || response.status !== 200 || response.type === 'opaque') {
+      return fetch(event.request)
+        .then(response => {
+          if (!response || response.status !== 200 || response.type === 'opaque') {
+            return response;
+          }
+
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
           return response;
-        }
-
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        return response;
-
-      }).catch(() => {
-
-        // ✅ إذا فشل الاتصال وطلب HTML → أرجع index.html المحفوظ
-        const accept = event.request.headers.get('accept') || '';
-        if (accept.includes('text/html')) {
-          return caches.match('./index.html').then(fallback => {
-            if (fallback) return fallback;
-
-            // إذا حتى index.html غير موجود → صفحة احتياطية مضمّنة
-            return new Response(
-              '<!DOCTYPE html><html lang="ar" dir="rtl"><head>' +
-              '<meta charset="UTF-8">' +
-              '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-              '<title>غير متصل</title></head>' +
-              '<body style="font-family:sans-serif;text-align:center;padding:3rem;background:#f0e8d8;">' +
-              '<h2 style="color:#0d47a1;">⚠️ غير متصل بالإنترنت</h2>' +
-              '<p style="color:#555;margin-top:1rem;">بيانات التطبيق بحاجة للتحديث</p>' +
-              '<p style="color:#555;">يرجى الاتصال بالإنترنت أولاً ثم إعادة فتح التطبيق</p>' +
-              '<button onclick="location.reload()" style="margin-top:2rem;padding:12px 24px;background:#0d47a1;color:#fff;border:none;border-radius:8px;font-size:16px;">🔄 إعادة المحاولة</button>' +
-              '</body></html>',
-              { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-            );
-          });
-        }
-
-        // ✅ للطلبات الأخرى (CSS/JS/صور) → أرجع استجابة نظيفة
-        return new Response('', {
-          status: 408,
-          statusText: 'Offline'
+        })
+        .catch(() => {
+          // إذا فشل الاتصال وطلب HTML → أرجع index.html
+          if (event.request.headers.get('accept')?.includes('text/html')) {
+            return caches.match('./index.html');
+          }
         });
-      });
     })
   );
 });
 
-// 📩 رسائل من الصفحة (KEEP_ALIVE)
+// ============================================
+// 4) رسالة من الصفحة → احذف الكاش فوراً
+// ============================================
 self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'KEEP_ALIVE') {
-    console.log('💚 Service Worker نشط');
+  if (event.data === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys()
+        .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+        .then(() => {
+          console.log('✅ تم حذف كل الكاش');
+          return self.registration.unregister(); // اختياري: إلغاء SW
+        })
+        .then(() => self.clients.matchAll())
+        .then(clients => clients.forEach(c => c.navigate(c.url)))
+    );
   }
 });

@@ -3,28 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تمرين السحب والإفلات</title>
+<title>قالب الدرس</title>
 <link rel="stylesheet" href="losson.css">
 </head>
 <body>
 
+<!-- 🟢 الشريط العلوي -->
 <div class="top-frame">
   <div class="lesson-name" id="lessonName">—</div>
   <button class="exit-btn" id="exitBtn">&gt;</button>
 </div>
 
+<!-- 📄 محتوى الصفحة -->
 <div class="page-wrapper">
   <div class="content-wrapper">
-    <div id="dropZone"></div>
-    <div class="divider"></div>
-    <div class="items-pool" id="itemsPool"></div>
-    <div class="result-msg" id="resultMsg"></div>
+    <img id="slideImage" class="slide-image" src="" alt="صورة">
+    <div class="text-box">
+      <div class="page-number" id="pageNumber">صفحة 1</div>
+      <p class="slide-text" id="slideText">—</p>
+
+      <!-- 🔊 زر الاستماع -->
+      <button class="listen-btn" id="listenBtn" type="button">
+        <span class="listen-icon">🔊</span>
+        <span class="listen-label">اسمع</span>
+      </button>
+    </div>
   </div>
 </div>
 
+<!-- 📢 نص آخر صفحة -->
+<div class="final-message" id="finalMessage">أحسنت! انتهى الدرس</div>
+
+<!-- 🎛️ أزرار التنقل -->
 <div class="fixed-actions">
-  <button class="nav-btn reset" id="resetBtn">🔄 إعادة</button>
-  <button class="nav-btn check" id="checkBtn">✅ تحقق</button>
+  <button class="nav-btn prev" id="prevBtn">→ السابق</button>
+  <button class="nav-btn next" id="nextBtn">التالي ←</button>
 </div>
 
 <div class="bottom-frame"></div>
@@ -37,9 +50,57 @@
   <div class="win-text">أحسنت!</div>
 </div>
 
-<!-- 🔊 صوت الأزرار -->
-<audio id="clickSound" src="sonud/buttem.mp3" preload="auto"></audio>
+<!-- 🎧 عنصر صوت الصفحة -->
+<audio id="slideAudio" preload="auto"></audio>
 
+<!-- 🔊 صوت الأزرار -->
+<audio id="clickSound" src="sound/buttem.mp3" preload="auto"></audio>
+
+<!-- ⚙️ الإعدادات (CONFIG) — ضعها قبل losson.js -->
+<script>
+const CONFIG = {
+  lessonName: "درس الرياضيات - الفصل الأول",
+  lessonId: "lesson1",
+  stageNumber: 1,
+
+  exitUrl: "stages.html",
+  exitConfirmMessage: "هل تريد الخروج من الدرس؟",
+
+  finishButtonText: "✅ انتهى الدرس",
+  finishRedirectUrl: "stages.html",
+
+  /* 🎉 إعدادات الفوز */
+  winText: "أحسنت! 🎉",
+  winDuration: 2000,
+
+  lessonsStagesKey: "lessons_stages_count",
+  solvedListKey:    "solved_lessons_list",
+
+  slides: [
+    {
+      id: 1,
+      image: "photo/page1.jpg",
+      text: "هذه الصفحة رقم 1.",
+      audio: "sound/page1.mp3"
+    },
+    {
+      id: 2,
+      image: "photo/page2.jpg",
+      text: "هذه الصفحة رقم 2.",
+      audio: "sound/page2.mp3"
+    },
+    {
+      id: 3,
+      image: "photo/page3.jpg",
+      text: "هذه الصفحة رقم 3 والأخيرة.",
+      audio: "sound/page3.mp3"
+    }
+  ]
+};
+</script>
+
+<!-- 🚀 سكربت الدرس -->
 <script src="losson.js"></script>
+
 </body>
 </html>

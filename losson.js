@@ -116,18 +116,12 @@ slideAudio.addEventListener('ended', () => updateListenBtn(false));
    ============================================================ */
 
 function showWinCelebration(callback) {
-
-  /* ✏️ غيّر النص إن أردت */
   const winTextEl = winOverlay.querySelector('.win-text');
   winTextEl.textContent = CONFIG.winText;
 
-  /* 🎊 أضف قصاصات الاحتفال */
   createConfetti(winOverlay);
-
-  /* 👁️ أظهر الطبقة */
   winOverlay.classList.add('show');
 
-  /* ⏱️ انتظر ثم انتقل */
   setTimeout(() => {
     winOverlay.classList.remove('show');
     if (typeof callback === 'function') callback();
@@ -150,7 +144,6 @@ function createConfetti(container) {
     c.style.borderRadius = Math.random() > 0.5 ? '2px' : '50%';
     container.appendChild(c);
 
-    /* 🧹 احذف بعد انتهاء الحركة */
     setTimeout(() => c.remove(), 4000);
   }
 }
@@ -169,10 +162,6 @@ nextBtn.onclick = () => {
     return;
   }
 
-  /* ============================================================
-     🎉 إنهاء الدرس → تأثير فوز ثم انتقال
-     ============================================================ */
-
   /* 🔒 عطّل الزر لمنع الضغط المتكرر */
   nextBtn.disabled = true;
 
@@ -185,7 +174,6 @@ nextBtn.onclick = () => {
 
   /* 🎊 شغّل تأثير الفوز ثم انتقل */
   showWinCelebration(() => {
-
     /* 🧹 امسح رقم الصفحة */
     try { localStorage.removeItem(PAGE_KEY); } catch(_) {}
 
@@ -202,9 +190,8 @@ nextBtn.onclick = () => {
    ============================================================ */
 
 document.getElementById('exitBtn').onclick = () => {
-  window.location.href = CONFIG.exitUrl;
+  if (!confirm(CONFIG.exitConfirmMessage)) return;
 
-  /* 🛑 أوقف الصوت عند الخروج */
   try {
     slideAudio.pause();
     slideAudio.currentTime = 0;
@@ -246,6 +233,21 @@ function markLessonAsSolved(lessonId) {
     console.error("markLessonAsSolved error:", e);
   }
 }
+
+/* ============================================================
+   🔊 صوت الأزرار (لكل الأزرار ما عدا زر الاستماع)
+   ============================================================ */
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.disabled) return;
+  if (btn.id === 'listenBtn') return;
+
+  const s = document.getElementById('clickSound');
+  if (!s) return;
+  s.currentTime = 0;
+  s.play().catch(() => {});
+}, true);
 
 /* ============================================================
    🚀 استرجاع الحالة عند الفتح
