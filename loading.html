@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جارٍ التحميل...</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0e8d8 0%, #e8dcc8 50%, #f0e8d8 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .loader-wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .spinner {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 6px solid rgba(46, 125, 50, 0.15);
+    border-top-color: #2e7d32;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2e7d32;
+    text-align: center;
+  }
+
+  .loading-sub {
+    font-size: 14px;
+    color: #555;
+    text-align: center;
+    max-width: 320px;
+    line-height: 1.6;
+  }
+
+  .progress-bar {
+    width: min(80vw, 360px);
+    height: 10px;
+    background: rgba(46, 125, 50, 0.15);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #2e7d32, #66bb6a);
+    border-radius: 20px;
+    transition: width 0.35s ease;
+  }
+
+  .progress-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e7d32;
+    font-family: monospace;
+  }
+
+  .dots::after {
+    content: "index.html";
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%   { content: ""; }
+    25%  { content: "."; }
+    50%  { content: ".."; }
+    75%  { content: "..."; }
+    100% { content: ""; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loader-wrap">
+  <div class="spinner"></div>
+  <div class="loading-title">🚀 جارٍ تجهيز التطبيق<span class="dots"></span></div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-text" id="progressText">0%</div>
+
+  <div class="loading-sub">
+    يتم تحميل جميع الملفات لأول مرة، سيتم فتح التطبيق تلقائيًا بعد الانتهاء.
+  </div>
+</div>
+
+<script>
+  // 🎯 الصفحة التي سيتم الانتقال إليها بعد التحميل
+  const REDIRECT_URL = './index.html';  // ← غيّرها إلى أي صفحة تريدها
+
+  // ===== تحديث شريط التقدم عند استقبال التقدم من SW =====
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      const data = event.data || {};
+
+      if (data.type === 'PRECACHE_PROGRESS') {
+        const percent = Math.round((data.loaded / data.total) * 100);
+        document.getElementById('progressFill').style.width = percent + '%';
+        document.getElementById('progressText').textContent = percent + '%';
+      }
+
+      if (data.type === 'PRECACHE_DONE') {
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressText').textContent = '100%';
+        setTimeout(() => {
+          window.location.replace(REDIRECT_URL);
+        }, 600);
+      }
+    });
+
+    navigator.serviceWorker.ready.then((reg) => {
+      if (reg.active) reg.active.postMessage({ type: 'PAGE_READY' });
+    });
+  } else {
+    window.location.replace(REDIRECT_URL);
+  }
+
+  // ===== احتياطي: إذا لم يستجب SW بعد 20 ثانية → افتح الصفحة =====
+  setTimeout(() => {
+    window.location.replace(REDIRECT_URL);
+  }, 200);
+</script>
+
+</body>
+</html>

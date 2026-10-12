@@ -75,6 +75,7 @@
     border: 1px solid rgba(46, 125, 50, 0.1);
     animation: floatUp linear infinite;
     will-change: transform;
+    z-index: 0;
   }
 
   @keyframes floatUp {
@@ -96,6 +97,7 @@
     border: 2px solid rgba(13, 71, 161, 0.06);
     animation: rotateShape linear infinite;
     will-change: transform;
+    z-index: 0;
   }
 
   @keyframes rotateShape {
@@ -110,6 +112,7 @@
     border: 2px solid rgba(46, 125, 50, 0.08);
     animation: pulseRing 6s ease-out infinite;
     will-change: transform, opacity;
+    z-index: 0;
   }
 
   @keyframes pulseRing {
@@ -394,11 +397,13 @@ function createAnimatedBackground() {
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     const size = 30 + Math.random() * 100;
+    const duration = 14 + Math.random() * 20; // مدة الدورة
     bubble.style.width = size + "px";
     bubble.style.height = size + "px";
     bubble.style.left = Math.random() * 100 + "%";
-    bubble.style.animationDuration = (14 + Math.random() * 20) + "s";
-    bubble.style.animationDelay = (Math.random() * 18) + "s";
+    bubble.style.animationDuration = duration + "s";
+    // ✅ تأخير سالب: تبدأ الفقاعة من منتصف دورتها فورًا
+    bubble.style.animationDelay = -(Math.random() * duration) + "s";
     bg.appendChild(bubble);
   }
 
@@ -407,13 +412,14 @@ function createAnimatedBackground() {
     const shape = document.createElement("div");
     shape.className = "shape";
     const size = 50 + Math.random() * 90;
+    const duration = 25 + Math.random() * 30;
     shape.style.width = size + "px";
     shape.style.height = size + "px";
     shape.style.left = (5 + Math.random() * 90) + "%";
     shape.style.top = (5 + Math.random() * 90) + "%";
     shape.style.borderRadius = Math.random() > 0.5 ? "50%" : "12%";
-    shape.style.animationDuration = (25 + Math.random() * 30) + "s";
-    shape.style.animationDelay = (Math.random() * 10) + "s";
+    shape.style.animationDuration = duration + "s";
+    shape.style.animationDelay = -(Math.random() * duration) + "s";
     bg.appendChild(shape);
   }
 
@@ -422,12 +428,13 @@ function createAnimatedBackground() {
     const pulse = document.createElement("div");
     pulse.className = "pulse-circle";
     const size = 40 + Math.random() * 60;
+    const duration = 5 + Math.random() * 4;
     pulse.style.width = size + "px";
     pulse.style.height = size + "px";
     pulse.style.left = (10 + Math.random() * 80) + "%";
     pulse.style.top = (10 + Math.random() * 80) + "%";
-    pulse.style.animationDuration = (5 + Math.random() * 4) + "s";
-    pulse.style.animationDelay = (Math.random() * 6) + "s";
+    pulse.style.animationDuration = duration + "s";
+    pulse.style.animationDelay = -(Math.random() * duration) + "s";
     bg.appendChild(pulse);
   }
 }
