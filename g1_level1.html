@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <!-- ⚡ 1) تطبيق الإعدادات فوراً -->
+<!-- <script src="setting_mc.js"></script> -->
+
+<!-- 🎨 2) المتغيرات العامة (الوضع الداكن + حجم الخط) -->
+<!-- <link rel="stylesheet" href="m_c.css"> -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قالب الدرس</title>
-<link rel="stylesheet" href="losson.css">
+<link rel="stylesheet" href="losson_code/losson.css">
 </head>
 <body>
 
@@ -32,7 +37,7 @@
 </div>
 
 <!-- 📢 نص آخر صفحة -->
-<div class="final-message" id="finalMessage">أحسنت! انتهى الدرس</div>
+<div class="final-message" id="finalMessage">روه البخاري</div>
 
 <!-- 🎛️ أزرار التنقل -->
 <div class="fixed-actions">
@@ -59,7 +64,7 @@
 <!-- ⚙️ الإعدادات (CONFIG) — ضعها قبل losson.js -->
 <script>
 const CONFIG = {
-  lessonName: "درس الرياضيات - الفصل الأول",
+  lessonName: "الحديث الأول _فضل الصيام",
   lessonId: "lesson1",
   stageNumber: 1,
 
@@ -79,20 +84,20 @@ const CONFIG = {
   slides: [
     {
       id: 1,
-      image: "photo/page1.jpg",
-      text: "هذه الصفحة رقم 1.",
+      image: "photo/d.png",
+      text: "قال النبيﷺ :في الجنة ثمانية أبواب ",
       audio: "sound/page1.mp3"
     },
     {
       id: 2,
-      image: "photo/page2.jpg",
-      text: "هذه الصفحة رقم 2.",
+      image: "photo/d1.png",
+      text: "فيها باب يسمى الريان",
       audio: "sound/page2.mp3"
     },
     {
       id: 3,
-      image: "photo/page3.jpg",
-      text: "هذه الصفحة رقم 3 والأخيرة.",
+      image: "photo/f1_1.png",
+      text: "لا يدخله إلا الصائمون ",
       audio: "sound/page3.mp3"
     }
   ]
@@ -100,7 +105,7 @@ const CONFIG = {
 </script>
 
 <!-- 🚀 سكربت الدرس -->
-<script src="losson.js"></script>
+<script src="losson_code/losson.js"></script>
 
 </body>
 </html>

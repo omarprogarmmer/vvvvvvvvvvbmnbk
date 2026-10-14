@@ -314,6 +314,12 @@
         <span class="icon">👤</span>
         <span>الملف الشخصي</span>
       </button>
+
+      <!-- ⚙️ زر الإعدادات (جديد) -->
+      <button class="main-btn" id="settingsBtn">
+        <span class="icon">⚙️</span>
+        <span>الإعدادات</span>
+      </button>
     </div>
 
   </div>
@@ -334,12 +340,11 @@ function createAnimatedBackground() {
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     const size = 40 + Math.random() * 120;
-    const duration = 12 + Math.random() * 18; // مدة الدورة
+    const duration = 12 + Math.random() * 18;
     bubble.style.width = size + "px";
     bubble.style.height = size + "px";
     bubble.style.left = Math.random() * 100 + "%";
     bubble.style.animationDuration = duration + "s";
-    // ✅ تأخير سالب: تبدأ الفقاعة من منتصف دورتها فورًا
     bubble.style.animationDelay = -(Math.random() * duration) + "s";
     bg.appendChild(bubble);
   }
@@ -365,8 +370,9 @@ function createAnimatedBackground() {
    🔗 روابط الأزرار
    ============================================================ */
 const CONFIG = {
-  startUrl:   "stages.html",
-  profileUrl: "profile.html",
+  startUrl:    "stages.html",
+  profileUrl:  "profile.html",
+  settingsUrl: "settings.html",
 };
 
 document.getElementById('startBtn').onclick = () => {
@@ -375,6 +381,11 @@ document.getElementById('startBtn').onclick = () => {
 
 document.getElementById('profileBtn').onclick = () => {
   window.location.href = CONFIG.profileUrl;
+};
+
+/* ⚙️ زر الإعدادات (جديد) */
+document.getElementById('settingsBtn').onclick = () => {
+  window.location.href = CONFIG.settingsUrl;
 };
 
 document.addEventListener('keydown', (e) => {

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <!-- ⚡ 1) تطبيق الإعدادات فوراً -->
+<script src="setting_mc.js"></script>
+
+<!-- 🎨 2) المتغيرات العامة (الوضع الداكن + حجم الخط) -->
+<link rel="stylesheet" href="m_c.css">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>خريطة المراحل</title>
@@ -445,7 +450,9 @@ function createAnimatedBackground() {
 
 const CONFIG = {
   totalStages: 20,
-  dividerEvery: 5,
+  dividerEvery: 4,
+  themeKey: "app_theme",
+  fontSizeKey: "app_font_size",
 
   exitUrl: "index.html",
   exitConfirmMessage: "هل تريد الخروج؟",
@@ -454,26 +461,33 @@ const CONFIG = {
   exercisesKey: "exercises_stages_count",
 
   stageLinks: {
+    // :  "g_t.html"
+
+    // 1:  "g_level.html",
     1:  "g1_level1.html",
     2:  "g1_t1.html",
     3:  "g1_t2.html",
-    4:  "drag3.html",
-    5:  "drag4.html",
-    6:  "drag5.html",
-    7:  "drag6.html",
-    8:  "drag7.html",
-    9:  "drag8.html",
-    10: "drag9.html",
-    11: "drag10.html",
-    12: "drag11.html",
-    13: "drag12.html",
-    14: "drag13.html",
-    15: "drag14.html",
-    16: "drag15.html",
-    17: "drag16.html",
-    18: "drag17.html",
-    19: "drag18.html",
-    20: "drag19.html",
+    4:  "g1_t.html",
+// 2
+    5:  "g2_level1.html",
+    6:  "g2_t.html",
+    7:  "g2_t.html",
+    8:  "g2_t.html",
+// 3
+    9:  "g3_level1.html",
+    10: "g3_t.html",
+    11: "g3_t.html",
+    12: "g3_t.html",
+// 4
+    13: "g4_level1.html",
+    14: "g4_t.html",
+    15: "g4_t.html",
+    16: "g4_t.html",
+// 5
+    17: "g5_level1.html",
+    18: "g5_t.html",
+    19: "g5_t.html",
+    20: "g5_t.html",
   },
 };
 
