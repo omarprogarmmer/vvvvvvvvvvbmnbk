@@ -42,12 +42,16 @@ function showSlide(index) {
     nextBtn.textContent = CONFIG.finishButtonText;
     nextBtn.classList.add('finish');
     nextBtn.classList.remove('next');
-    finalMsg.classList.add('show');
   } else {
     nextBtn.textContent = "التالي ←";
     nextBtn.classList.add('next');
     nextBtn.classList.remove('finish');
-    finalMsg.classList.remove('show');
+  }
+
+  /* ✅ نص أسفل الصفحة (متغير حسب كل صفحة) */
+  if (finalMsg) {
+    finalMsg.textContent = slide.footer || '';
+    finalMsg.classList.toggle('show', !!slide.footer);
   }
 
   currentIndex = index;
