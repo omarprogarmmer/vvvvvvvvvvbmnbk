@@ -2,7 +2,7 @@
 // Service Worker - my-app-v4
 // ============================================
 
-const CACHE_NAME = 'my-app-v4'; // ← غيّر الرقم عند كل تحديث
+const CACHE_NAME = 'my-app-v2'; // ← لا تغيّره، الآلية تعتمد على فحص الكاش
 
 const PRECACHE_ASSETS = [
   // ===== ملفات CSS =====
@@ -22,67 +22,97 @@ const PRECACHE_ASSETS = [
   './g1_level1.html',
   './g1_t1.html',
   './g1_t2.html',
-  './drag3.html',
-  './drag4.html',
-  './drag5.html',
-  './drag6.html',
-  './drag7.html',
-  './drag8.html',
-  './drag9.html',
-  './drag10.html',
-  './drag11.html',
-  './drag12.html',
-  './drag13.html',
-  './drag14.html',
-  './drag15.html',
-  './drag16.html',
-  './drag17.html',
-  './drag18.html',
-  './drag19.html',
+  './g2_level1.html',
+  './g2_t1.html',
+  './g2_t2.html',
+  './g2_t3.html',
+  './g3_level1.html',
+  './g3_t2.html',
+  './g3_t3.html',
+  './g4_level1.html',
+  './g4_t3.html',
+  './g4_t2.html',
 
   // ===== ملفات الإعداد =====
   './manifest.json',
 
   // ===== الصور =====
-  'photo/Built in Silence.jpg',
-  'photo/d.png',
-  'photo/d1.png',
-  'photo/f1_1.png',
-  'photo/SnapBG.ai_1788007924138.png',
-  'photo/SnapBG.ai_1788007926352.png',
+  './photo/3_e.jpg',
+  './photo/3_j.jpg',
+  './photo/4_dde.jpg',
+  './photo/4_ddt.jpg',
+  './photo/4_dt.jpg',
+  './photo/d.png',
+  './photo/d1.png',
+  './photo/f1_1.png',
+  './photo/gg1.png',
+  './photo/gg2.jpg',
+  './photo/gg3.png',
 ];
 
 // ============================================
-// 1) التثبيت: حمّل كل الملفات مرة واحدة
+// ✅ دالة مساعدة: أضف الملف فقط إذا لم يكن موجوداً
+// ============================================
+async function addIfMissing(cache, url) {
+  const existing = await cache.match(url);
+  if (existing) {
+    return { url, status: 'skipped' };
+  }
+  try {
+    await cache.add(url);
+    return { url, status: 'downloaded' };
+  } catch (err) {
+    return { url, status: 'failed', error: err };
+  }
+}
+
+// ============================================
+// 1) التثبيت: حمّل فقط الملفات الناقصة
 // ============================================
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(async cache => {
-        console.log('📦 بدء تحميل جميع الملفات...');
+        console.log('📦 بدء التحقق من الملفات...');
 
-        let loaded = 0;
         const total = PRECACHE_ASSETS.length;
+        let processed = 0;   // كل ما تم فحصه
+        let downloaded = 0;  // الملفات الجديدة فقط
+        let skipped = 0;     // الملفات الموجودة مسبقاً
+        let failed = 0;      // الملفات الفاشلة
 
-        // ✅ تحميل كل ملف على حدة + إرسال التقدم للصفحات
         await Promise.allSettled(
-          PRECACHE_ASSETS.map(url =>
-            cache.add(url)
-              .then(() => {
-                loaded++;
-                broadcastProgress(loaded, total);
-                console.log(`✅ (${loaded}/${total}) تم تحميل:`, url);
-              })
-              .catch(err => {
-                loaded++;
-                broadcastProgress(loaded, total);
-                console.warn('⚠️ فشل تحميل:', url, err);
-              })
-          )
+          PRECACHE_ASSETS.map(async url => {
+            const result = await addIfMissing(cache, url);
+
+            processed++;
+            if (result.status === 'downloaded') downloaded++;
+            else if (result.status === 'skipped') skipped++;
+            else failed++;
+
+            // 📣 أرسل التقدم للصفحات
+            broadcastProgress({
+              processed,
+              downloaded,
+              skipped,
+              failed,
+              total,
+            });
+
+            if (result.status === 'downloaded') {
+              console.log(`⬇️ (${processed}/${total}) تم تنزيل جديد:`, url);
+            } else if (result.status === 'skipped') {
+              console.log(`⏭️ (${processed}/${total}) موجود مسبقاً:`, url);
+            } else {
+              console.warn(`⚠️ (${processed}/${total}) فشل:`, url, result.error);
+            }
+
+            return result;
+          })
         );
 
-        console.log('🎉 انتهى تحميل جميع الملفات');
-        broadcastDone();
+        console.log(`🎉 انتهى الفحص: جديد=${downloaded} | موجود=${skipped} | فشل=${failed}`);
+        broadcastDone({ downloaded, skipped, failed, total });
         return self.skipWaiting();
       })
   );
@@ -91,28 +121,30 @@ self.addEventListener('install', event => {
 // ============================================
 // 📣 إرسال التقدم إلى كل الصفحات المفتوحة
 // ============================================
-function broadcastProgress(loaded, total) {
+function broadcastProgress(payload) {
   self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
     clients.forEach(client => {
       client.postMessage({
         type: 'PRECACHE_PROGRESS',
-        loaded,
-        total,
+        ...payload,
       });
     });
   });
 }
 
-function broadcastDone() {
+function broadcastDone(payload) {
   self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
     clients.forEach(client => {
-      client.postMessage({ type: 'PRECACHE_DONE' });
+      client.postMessage({
+        type: 'PRECACHE_DONE',
+        ...payload,
+      });
     });
   });
 }
 
 // ============================================
-// 2) التفعيل: احذف كل الكاش القديم
+// 2) التفعيل: احذف فقط الكاش القديم جداً
 // ============================================
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -120,9 +152,9 @@ self.addEventListener('activate', event => {
       .then(keys => {
         return Promise.all(
           keys
-            .filter(key => key !== CACHE_NAME)
+            .filter(key => key !== CACHE_NAME && key.startsWith('my-app-'))
             .map(key => {
-              console.log('🗑️ حذف الكاش القديم:', key);
+              console.log('🗑️ حذف كاش قديم:', key);
               return caches.delete(key);
             })
         );
@@ -137,15 +169,13 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
-  const url = new URL(event.request.url);
-
-  // 🔁 إذا كان الطلب HTML ونحن في أول تثبيت → أظهر loading.html
+  // 🔁 إذا كان الطلب HTML
   if (event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       caches.match(event.request).then(cached => {
         if (cached) return cached;
 
-        // إذا كان الملف غير موجود في الكاش (زيارة أولى)
+        // إذا لم يكن في الكاش → اعرض صفحة الانتظار
         return caches.match('./loading.html').then(loading => {
           if (loading) return loading;
           return fetch(event.request);
@@ -205,19 +235,25 @@ self.addEventListener('message', event => {
 
   // 🕐 صفحة الانتظار جاهزة → أعد إرسال آخر تقدم
   if (data && data.type === 'PAGE_READY') {
-    // إذا كانت كل الملفات محمّلة → أبلغ الصفحة بالانتهاء فورًا
-    caches.open(CACHE_NAME).then(cache => {
-      cache.keys().then(keys => {
-        if (keys.length >= PRECACHE_ASSETS.length - 1) {
-          event.source?.postMessage({ type: 'PRECACHE_DONE' });
-        } else {
-          event.source?.postMessage({
-            type: 'PRECACHE_PROGRESS',
-            loaded: keys.length,
-            total: PRECACHE_ASSETS.length,
-          });
-        }
-      });
+    caches.open(CACHE_NAME).then(async cache => {
+      let found = 0;
+      for (const url of PRECACHE_ASSETS) {
+        const match = await cache.match(url);
+        if (match) found++;
+      }
+
+      if (found >= PRECACHE_ASSETS.length) {
+        event.source?.postMessage({ type: 'PRECACHE_DONE' });
+      } else {
+        event.source?.postMessage({
+          type: 'PRECACHE_PROGRESS',
+          processed: found,
+          total: PRECACHE_ASSETS.length,
+          downloaded: 0,
+          skipped: found,
+          failed: 0,
+        });
+      }
     });
   }
 });
